@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{148C75AC-094A-4478-936A-C28EA036C909}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Compiler", "src\Compiler\Compiler.fsproj", "{42CADC68-D776-4E0B-B964-2D9A40D09681}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{42CADC68-D776-4E0B-B964-2D9A40D09681}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42CADC68-D776-4E0B-B964-2D9A40D09681}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42CADC68-D776-4E0B-B964-2D9A40D09681}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42CADC68-D776-4E0B-B964-2D9A40D09681}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{42CADC68-D776-4E0B-B964-2D9A40D09681} = {148C75AC-094A-4478-936A-C28EA036C909}
+	EndGlobalSection
+EndGlobal
