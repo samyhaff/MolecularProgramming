@@ -57,11 +57,37 @@ let psqrt: Parser<Command> =
     (pspecies .>> ws .>> skipChar ']')
     (fun s1 s2 -> Sqrt(s1, s2))
 
+let (pifgt, pifgtimpl): Parser<Command> * Parser<Command> ref = createParserForwardedToRef ()
+let (pifge, pifgeimpl): Parser<Command> * Parser<Command> ref = createParserForwardedToRef ()
+let (piflt, pifltimpl): Parser<Command> * Parser<Command> ref = createParserForwardedToRef ()
+let (pifle, pifleimpl): Parser<Command> * Parser<Command> ref = createParserForwardedToRef ()
+let (pifeq, pifeqimpl): Parser<Command> * Parser<Command> ref = createParserForwardedToRef ()
+
 let pcommand: Parser<Command> =
-    choiceL [pload; padd; psub; pmul; pdiv; psqrt; pcmp] "command"
+    choiceL [pload; padd; psub; pmul; pdiv; psqrt; pcmp; pifgt; pifge; piflt; pifle; pifeq] "command"
 
 let pcommands: Parser<Command list> =
    sepBy pcommand (ws >>. skipChar ',' >>. ws)
+
+pifgtimpl.Value <-
+   skipString "ifgt" >>. ws >>. skipChar '[' >>. ws
+   >>. pcommands .>> ws .>> skipChar ']' |>> Ifgt
+
+pifgeimpl.Value <-
+   skipString "ifge" >>. ws >>. skipChar '[' >>. ws
+   >>. pcommands .>> ws .>> skipChar ']' |>> Ifge
+
+pifltimpl.Value <-
+   skipString "iflt" >>. ws >>. skipChar '[' >>. ws
+   >>. pcommands .>> ws .>> skipChar ']' |>> Iflt
+
+pifleimpl.Value <-
+   skipString "ifle" >>. ws >>. skipChar '[' >>. ws
+   >>. pcommands .>> ws .>> skipChar ']' |>> Ifle
+
+pifeqimpl.Value <-
+   skipString "ifeq" >>. ws >>. skipChar '[' >>. ws
+   >>. pcommands .>> ws .>> skipChar ']' |>> Ifeq
 
 let pstep: Parser<Root> =
     skipString "step" >>. ws >>. skipChar '[' >>. ws
