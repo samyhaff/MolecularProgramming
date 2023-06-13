@@ -57,6 +57,28 @@ let psqrt: Parser<Command> =
     (pspecies .>> ws .>> skipChar ']')
     (fun s1 s2 -> Sqrt(s1, s2))
 
+let pcommand: Parser<Command> =
+    choiceL [pload; padd; psub; pmul; pdiv; psqrt; pcmp] "command"
+
+let pcommands: Parser<Command list> =
+   sepBy pcommand (ws >>. skipChar ',' >>. ws)
+
+let pstep: Parser<Root> =
+    skipString "step" >>. ws >>. skipChar '[' >>. ws
+    >>. pipe2
+      pcommands
+      (ws >>. skipChar ']')
+      (fun cs _ -> Step(cs))
+
+let proot: Parser<Root> = choiceL [pconc; pstep] "root"
+
+let proots: Parser<Root list> =
+   sepBy proot (ws >>. skipChar ',' >>. ws)
+
+let pcrn: Parser<Crn> =
+   skipString "crn" >>. ws >>. skipChar '=' >>. ws >>. skipChar '{'
+   >>. proots .>> ws .>> skipChar '}' .>> ws .>> eof
+
 let test p string =
    match run p string with
    | Success(result, _, _) -> printfn "%A" result
