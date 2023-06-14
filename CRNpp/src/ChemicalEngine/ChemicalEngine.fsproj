@@ -6,6 +6,7 @@
   <ItemGroup>
     <Compile Include="Reaction.fs" />
     <Compile Include="Simulator.fs" />
+    <Compile Include="Modules.fs" />
     <Compile Include="Checks.fs" />
   </ItemGroup>
   <ItemGroup>

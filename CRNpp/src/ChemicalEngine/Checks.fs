@@ -12,12 +12,7 @@ module Checks =
         let B = C("B", c2, 1)
         let C = C("C", 0, 1)
 
-        let reactions :Reaction list= [
-            (["A";"B"], 1, ["A";"B";"C"]);
-            (["C"], 1, [])
-        ]
-
-        let crn = toCRN reactions [A;B;C] |> Simulator.run
+        let crn = Modules.mul A B C |> Simulator.runToStable 1e-5
         let (C(_,result,_)) = Map.find "C" (snd crn)
         floatEquals result (c1*c2)
 

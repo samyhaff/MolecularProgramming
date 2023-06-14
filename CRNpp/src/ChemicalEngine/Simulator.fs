@@ -25,24 +25,23 @@ module Simulator =
 
         reactions |> List.map (summands name solution) |> List.sum |> float
 
-    let run (crn:CRN) = 
-        let stable (current:Solution) (next:Solution) =
-            let stableConcentrations (C(_,c1,_)) (C(_,c2,_)) =
-                abs (c2-c1) < 0.1
-            in Map.forall (fun name chemical -> stableConcentrations chemical (Map.find name next)) current
-
+    let update crn =
         let updateChemical crn (C(n,c,m)) = 
             let concentationChange = dS crn n
             C(n, c + concentationChange, m)
 
-        let updateCRN (crn:CRN) :CRN = 
-            let updatedSolution = Map.map(fun name chemical -> updateChemical crn chemical) (snd crn)
-            (fst crn, updatedSolution)
+        let updatedSolution = Map.map(fun _ chemical -> updateChemical crn chemical) (snd crn)
+        in (fst crn, updatedSolution)
 
-        let rec update crn n maxUpdates = 
-            let next = updateCRN crn
-            // printfn "Next: %A" (snd next |> Map.values |> Seq.toList)
-            if (n = maxUpdates || stable (snd crn) (snd next)) 
+    let runToStable (tolerance:float) (crn:CRN) = 
+        let stable (current:Solution) (next:Solution) (tolerance:float) =
+            let stableConcentrations (C(_,c1,_)) (C(_,c2,_)) =
+                abs (c2-c1) < tolerance
+            in Map.forall (fun name chemical -> stableConcentrations chemical (Map.find name next)) current
+
+        let rec runner crn tolerance n maxUpdates = 
+            let next = update crn
+            if (n = maxUpdates || stable (snd crn) (snd next) tolerance) 
             then next
-            else update next (n+1) maxUpdates
-        in update crn 0 100
+            else runner next tolerance (n+1) maxUpdates
+        in runner crn tolerance 0 100
