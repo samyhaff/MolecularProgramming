@@ -7,7 +7,7 @@ crn = {
         cmp[a,b]
     ],
     step[
-        ifGT[{ sub[atmp,btmp,a] }],
-        ifLT[{ sub[btmp,atmp,b] }]
+        ifGT[sub[atmp,btmp,a]],
+        ifLT[sub[btmp,atmp,b]]
     ]
 }

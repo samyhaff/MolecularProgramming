@@ -1,15 +1,13 @@
-﻿open Parser
+﻿open System
+open Parser
 
-test pcrn "crn = {
-    conc[a,8.0],
-    conc[b,2.0],
-    step[
-        ld[a, atmp],
-        ld[b, btmp],
-        cmp[a,b]
-    ],
-    step[
-        ifGT[sub[atmp,btmp,a]],
-        ifLT[sub[btmp,atmp,b]]
-    ]
-}"
+[<EntryPoint>]
+let main argv =
+   let programName = AppDomain.CurrentDomain.FriendlyName
+   if argv.Length = 0 then
+      printfn "Usage: %s <filename>" programName
+      1
+   else
+      let code = IO.File.ReadAllText(argv.[1])
+      test pcrn code
+      0
