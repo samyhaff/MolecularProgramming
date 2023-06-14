@@ -26,7 +26,12 @@ let ptwoargs (command: string) : Parser<Command> =
     >>. pipe2
       (pspecies .>> skipChar ',' .>> ws)
       (pspecies .>> ws .>> skipChar ']')
-      (fun s1 s2 -> Load(s1, s2))
+      (fun s1 s2 ->
+         match command with
+         | "ld" -> Load(s1, s2)
+         | "cmp" -> Cmp(s1, s2)
+         | "sqrt" -> Sqrt(s1, s2)
+         | _ -> failwith "ptwoargs: unknown command")
 
 let pload: Parser<Command> = ptwoargs "ld"
 let pcmp: Parser<Command> = ptwoargs "cmp"
@@ -49,13 +54,7 @@ let padd: Parser<Command> = pbinop "add"
 let psub: Parser<Command> = pbinop "sub"
 let pmul: Parser<Command> = pbinop "mul"
 let pdiv: Parser<Command> = pbinop "div"
-
-let psqrt: Parser<Command> =
-  skipString "sqrt" >>. ws >>. skipChar '[' >>. ws
-  >>. pipe2
-    (pspecies .>> skipChar ',' .>> ws)
-    (pspecies .>> ws .>> skipChar ']')
-    (fun s1 s2 -> Sqrt(s1, s2))
+let psqrt: Parser<Command> = ptwoargs "sqrt"
 
 let (pifgt, pifgtimpl): Parser<Command> * Parser<Command> ref = createParserForwardedToRef ()
 let (pifge, pifgeimpl): Parser<Command> * Parser<Command> ref = createParserForwardedToRef ()
@@ -67,43 +66,40 @@ let pcommand: Parser<Command> =
     choiceL [pload; padd; psub; pmul; pdiv; psqrt; pcmp; pifgt; pifge; piflt; pifle; pifeq] "command"
 
 let pcommands: Parser<Command list> =
-   sepBy pcommand (ws >>. skipChar ',' >>. ws)
+   sepBy (pcommand .>> ws) (skipChar ',' >>. ws)
 
 pifgtimpl.Value <-
-   skipString "ifgt" >>. ws >>. skipChar '[' >>. ws
+   skipString "ifGT" >>. ws >>. skipChar '[' >>. ws
    >>. pcommands .>> ws .>> skipChar ']' |>> Ifgt
 
 pifgeimpl.Value <-
-   skipString "ifge" >>. ws >>. skipChar '[' >>. ws
+   skipString "ifGE" >>. ws >>. skipChar '[' >>. ws
    >>. pcommands .>> ws .>> skipChar ']' |>> Ifge
 
 pifltimpl.Value <-
-   skipString "iflt" >>. ws >>. skipChar '[' >>. ws
+   skipString "ifLT" >>. ws >>. skipChar '[' >>. ws
    >>. pcommands .>> ws .>> skipChar ']' |>> Iflt
 
 pifleimpl.Value <-
-   skipString "ifle" >>. ws >>. skipChar '[' >>. ws
+   skipString "ifLE" >>. ws >>. skipChar '[' >>. ws
    >>. pcommands .>> ws .>> skipChar ']' |>> Ifle
 
 pifeqimpl.Value <-
-   skipString "ifeq" >>. ws >>. skipChar '[' >>. ws
+   skipString "ifEQ" >>. ws >>. skipChar '[' >>. ws
    >>. pcommands .>> ws .>> skipChar ']' |>> Ifeq
 
 let pstep: Parser<Root> =
     skipString "step" >>. ws >>. skipChar '[' >>. ws
-    >>. pipe2
-      pcommands
-      (ws >>. skipChar ']')
-      (fun cs _ -> Step(cs))
+    >>. pcommands .>> ws .>> skipChar ']' |>> Step
 
 let proot: Parser<Root> = choiceL [pconc; pstep] "root"
 
 let proots: Parser<Root list> =
-   sepBy proot (ws >>. skipChar ',' >>. ws)
+   sepBy (proot .>> ws) (skipChar ',' >>. ws)
 
 let pcrn: Parser<Crn> =
    skipString "crn" >>. ws >>. skipChar '=' >>. ws >>. skipChar '{'
-   >>. proots .>> ws .>> skipChar '}' .>> ws .>> eof
+   >>. ws >>. proots .>> ws .>> skipChar '}' .>> ws .>> eof
 
 let test p string =
    match run p string with

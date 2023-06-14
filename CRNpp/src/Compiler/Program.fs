@@ -1,20 +1,15 @@
 ﻿open Parser
 
-test pconc "conc [atmp, 1.0]"
-test pload "ld [a, atmp]"
-test padd "add [a, atmp, b]"
-test psub "sub [a, atmp, b]"
-test pmul "mul [a, atmp, b]"
-test pdiv "div [a, atmp, b]"
-test psqrt "sqrt [a, atmp]"
-test pcmp "cmp [a, b]"
-test pcommands "ld [a, atmp], add [a, atmp, b], sub [a, atmp, b]"
-test pstep "step [ld [a, atmp], add [a, atmp, b], sub [a, atmp, b]]"
-test proot "conc [atmp, 1.0]"
-test proots "conc [atmp, 1.0], step [ld [a, atmp], add [a, atmp, b], sub [a, atmp, b]]"
-test pcrn "crn = {conc [atmp, 1.0], step [ld [a, atmp], add [a, atmp, b], sub [a, atmp, b]]}"
-test pifgt "ifgt [ld [a, atmp], add [a, atmp, b], sub [a, atmp, b], ifgt [ld [a, atmp], add [a, atmp, b], sub [a, atmp, b]]]"
-test pifge "ifge [ld [a, atmp], add [a, atmp, b], sub [a, atmp, b], ifge [ld [a, atmp], add [a, atmp, b], sub [a, atmp, b]]]"
-test piflt "iflt [ld [a, atmp], add [a, atmp, b], sub [a, atmp, b], iflt [ld [a, atmp], add [a, atmp, b], sub [a, atmp, b]]]"
-test pifle "ifle [ld [a, atmp], add [a, atmp, b], sub [a, atmp, b], ifle [ld [a, atmp], add [a, atmp, b], sub [a, atmp, b]]]"
-test pifeq "ifeq [ld [a, atmp], add [a, atmp, b], sub [a, atmp, b], ifeq [ld [a, atmp], add [a, atmp, b], sub [a, atmp, b]]]"
+test pcrn "crn = {
+    conc[a,8.0],
+    conc[b,2.0],
+    step[
+        ld[a, atmp],
+        ld[b, btmp],
+        cmp[a,b]
+    ],
+    step[
+        ifGT[sub[atmp,btmp,a]],
+        ifLT[sub[btmp,atmp,b]]
+    ]
+}"
