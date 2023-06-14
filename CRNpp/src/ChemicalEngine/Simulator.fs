@@ -6,24 +6,25 @@ module Simulator =
     let dS ((reactions,solution):CRN) (name:Name) = 
         let rateProduct solution (reactants:Reactants) = 
             reactants 
-             |> List.map (fun n -> Map.find n solution)
-             |> List.fold (fun acc (S(_,c,m)) -> acc * (c ** m)) 1.0 
+             |> Seq.map (fun n -> Map.find n solution)
+             |> Seq.fold (fun acc (S(_,c,m)) -> acc * pown c m) 1.0 
 
         let netChange (name:Name) (solution: Solution) (reactants:Reactants) (products:Products) :float = 
             let change (name:Name) (solution:Solution) (cs:Name list) = 
-                List.filter (fun n -> n = name) cs
-                |> List.map (fun n -> Map.find n solution)
-                |> List.map mult
-                |> List.sum 
+                Seq.filter (fun n -> n = name) cs
+                |> Seq.map (fun n -> Map.find n solution)
+                |> Seq.map mult
+                |> Seq.sum 
                 |> float
 
             let changeS = change name solution
             in (changeS products) - (changeS reactants)
 
         let summands (name:Name) (solution:Solution) ((reactants, rate, products):Reaction) = 
-            rate * (netChange name solution reactants products) * (rateProduct solution reactants)
+            let summand = rate * (netChange name solution reactants products) * (rateProduct solution reactants)
+            summand
 
-        reactions |> List.map (summands name solution) |> List.sum |> float
+        reactions |> Seq.map (summands name solution) |> Seq.sum |> float  |> (fun x -> x * 0.05)
 
     let update crn =
         let updateChemical crn (S(n,c,m)) =
@@ -33,6 +34,23 @@ module Simulator =
         let updatedSolution = Map.map(fun _ chemical -> updateChemical crn chemical) (snd crn)
         in (fst crn, updatedSolution)
 
+        
+
+    let extractConcentrations (names:Name Set) (steps:int) (crn:CRN seq) =
+        let slns = Seq.take steps crn |> Seq.map snd |> Seq.toList
+        List.map (fun n -> 
+            (n, slns |> List.map (fun s -> Map.find n s |> conc))
+        ) (Set.toList names)
+
+    let rec watch (steps:int) (crn:CRN) = 
+        let names = fst crn |> List.collect (fun (r,_,p) -> r @ p) |> Set.ofList
+        printfn "Names: %A" names
+
+        let rec simulate crn = 
+            seq {yield crn; yield! simulate (update crn)}
+
+        extractConcentrations names steps (simulate crn)
+
     let runToStable (tolerance:float) (crn:CRN) = 
         let stable (current:Solution) (next:Solution) (tolerance:float) =
             let stableConcentrations (S(_,c1,_)) (S(_,c2,_)) =
@@ -41,8 +59,10 @@ module Simulator =
 
         let rec runner crn tolerance n maxUpdates = 
             let next = update crn
-            // printfn "Next: %A" (snd next |> Map.values |> Seq.toList)
-            if (n = maxUpdates || stable (snd crn) (snd next) tolerance) 
+            if (stable (snd crn) (snd next) tolerance) 
             then next
+            else if n = maxUpdates 
+            then printfn "Max updates reached"
+                 next
             else runner next tolerance (n+1) maxUpdates
-        in runner crn tolerance 0 100
+        in runner crn tolerance 0 1_000

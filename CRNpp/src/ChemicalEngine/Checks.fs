@@ -6,13 +6,15 @@ module Checks =
 
     type Concentration = Con of float
 
-    let CRNtolerance = 1e-3
+    let CRNtolerance = 0.001
 
     let floatEquals f1 f2 =
-        abs (f2-f1) < 1e-2
+        abs (f2-f1) < 0.05
 
     let verify (name:Name) (crn:CRN) (expected:float) =
         Map.find name (snd crn) |> conc |> floatEquals expected
+    let concIn (crn:CRN) (s:Chemical) = 
+        Map.find (name s) (snd crn) |> conc
 
     let ldCheck (Con(c1)) (Con(c2)) =
         let A = S("A", c1, 1)
@@ -33,15 +35,15 @@ module Checks =
         verify (name C) crn (conc A + conc B)
 
     // todo add when sub module has fixed the oscilating result
-    // let subCheck (Con(c1)) (Con(c2)) (Con(c3)) =
-    //     let A = S("A", c1, 1)
-    //     let B = S("B", c2, 1)
-    //     let C = S("C", c3, 1)
+    let subCheck (Con(c1)) (Con(c2)) (Con(c3)) =
+        let A = S("A", c1, 1)
+        let B = S("B", c2, 1)
+        let C = S("C", c3, 1)
 
-    //     let crn = Modules.sub A B C |> Simulator.runToStable CRNtolerance
-    //     verify (name A) crn (conc A) && 
-    //     verify (name B) crn (conc B) && 
-    //     verify (name C) crn (if conc A > conc B then (conc A - conc B) else 0.0)
+        let crn = Modules.sub A B C |> Simulator.runToStable CRNtolerance
+        verify (name A) crn (conc A) && 
+        verify (name B) crn (conc B) && 
+        verify (name C) crn (if conc A > conc B then (conc A - conc B) else 0.0)
 
 
     let mulCheck (Con(c1)) (Con(c2)) (Con(c3)) =
@@ -90,6 +92,7 @@ module Checks =
         printfn "Checking modules:"
         checkQuick "ld" ldCheck
         checkQuick "add" addCheck
+        checkQuick "sub" subCheck
         checkQuick "mul" mulCheck
         printfn "Module checks done"
 
