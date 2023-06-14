@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{148C75AC-094
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Compiler", "src\Compiler\Compiler.fsproj", "{42CADC68-D776-4E0B-B964-2D9A40D09681}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ChemicalEngine", "src\ChemicalEngine\ChemicalEngine.fsproj", "{2C4249A4-4A22-4EF1-B5E2-0EC40353D8A5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,8 +22,13 @@ Global
 		{42CADC68-D776-4E0B-B964-2D9A40D09681}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42CADC68-D776-4E0B-B964-2D9A40D09681}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42CADC68-D776-4E0B-B964-2D9A40D09681}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C4249A4-4A22-4EF1-B5E2-0EC40353D8A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C4249A4-4A22-4EF1-B5E2-0EC40353D8A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C4249A4-4A22-4EF1-B5E2-0EC40353D8A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C4249A4-4A22-4EF1-B5E2-0EC40353D8A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{42CADC68-D776-4E0B-B964-2D9A40D09681} = {148C75AC-094A-4478-936A-C28EA036C909}
+		{2C4249A4-4A22-4EF1-B5E2-0EC40353D8A5} = {148C75AC-094A-4478-936A-C28EA036C909}
 	EndGlobalSection
 EndGlobal
