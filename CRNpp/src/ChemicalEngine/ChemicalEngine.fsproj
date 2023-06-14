@@ -6,5 +6,9 @@
   <ItemGroup>
     <Compile Include="Reaction.fs" />
     <Compile Include="Simulator.fs" />
+    <Compile Include="Checks.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="fscheck" Version="2.16.5" />
   </ItemGroup>
 </Project>

@@ -41,7 +41,7 @@ module Simulator =
 
         let rec update crn n maxUpdates = 
             let next = updateCRN crn
-            printfn "Next: %A" (snd next |> Map.values |> Seq.toList)
+            // printfn "Next: %A" (snd next |> Map.values |> Seq.toList)
             if (n = maxUpdates || stable (snd crn) (snd next)) 
             then next
             else update next (n+1) maxUpdates
