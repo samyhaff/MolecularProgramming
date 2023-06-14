@@ -1,13 +1,13 @@
 crn = {
-    conc[a,a0],
-    conc[b,b0],
-    step[{
+    conc[a,8],
+    conc[b,2],
+    step[
         ld[a, atmp],
         ld[b, btmp],
         cmp[a,b]
-    }],
-    step[{
+    ],
+    step[
         ifGT[{ sub[atmp,btmp,a] }],
         ifLT[{ sub[btmp,atmp,b] }]
-    }]
-};
+    ]
+}

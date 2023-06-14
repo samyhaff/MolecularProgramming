@@ -69,28 +69,22 @@ let pcommands: Parser<Command list> =
    sepBy (pcommand .>> ws) (skipChar ',' >>. ws)
 
 pifgtimpl.Value <-
-   skipString "ifGT" >>. ws >>. skipChar '[' >>. ws
-   >>. pcommands .>> ws .>> skipChar ']' |>> Ifgt
+   skipString "ifGT" >>. ws >>. between (skipChar '[' >>. ws) (ws >>. skipChar ']') (pcommands |>> Ifgt)
 
 pifgeimpl.Value <-
-   skipString "ifGE" >>. ws >>. skipChar '[' >>. ws
-   >>. pcommands .>> ws .>> skipChar ']' |>> Ifge
+   skipString "ifGE" >>. ws >>. between (skipChar '[' >>. ws) (ws >>. skipChar ']') (pcommands |>> Ifge)
 
 pifltimpl.Value <-
-   skipString "ifLT" >>. ws >>. skipChar '[' >>. ws
-   >>. pcommands .>> ws .>> skipChar ']' |>> Iflt
+   skipString "ifLT" >>. ws >>. between (skipChar '[' >>. ws) (ws >>. skipChar ']') (pcommands |>> Iflt)
 
 pifleimpl.Value <-
-   skipString "ifLE" >>. ws >>. skipChar '[' >>. ws
-   >>. pcommands .>> ws .>> skipChar ']' |>> Ifle
+   skipString "ifLE" >>. ws >>. between (skipChar '[' >>. ws) (ws >>. skipChar ']') (pcommands |>> Ifle)
 
 pifeqimpl.Value <-
-   skipString "ifEQ" >>. ws >>. skipChar '[' >>. ws
-   >>. pcommands .>> ws .>> skipChar ']' |>> Ifeq
+   skipString "ifEQ" >>. ws >>. between (skipChar '[' >>. ws) (ws >>. skipChar ']') (pcommands |>> Ifeq)
 
 let pstep: Parser<Root> =
-    skipString "step" >>. ws >>. skipChar '[' >>. ws
-    >>. pcommands .>> ws .>> skipChar ']' |>> Step
+    skipString "step" >>. ws >>. between (skipChar '[' >>. ws) (ws >>. skipChar ']') (pcommands |>> Step)
 
 let proot: Parser<Root> = choiceL [pconc; pstep] "root"
 
@@ -98,8 +92,7 @@ let proots: Parser<Root list> =
    sepBy (proot .>> ws) (skipChar ',' >>. ws)
 
 let pcrn: Parser<Crn> =
-   skipString "crn" >>. ws >>. skipChar '=' >>. ws >>. skipChar '{'
-   >>. ws >>. proots .>> ws .>> skipChar '}' .>> ws .>> eof
+   skipString "crn" >>. ws >>. skipChar '=' >>. ws >>. between (skipChar '{' >>. ws) (ws >>. skipChar '}') proots .>> ws .>> eof
 
 let test p string =
    match run p string with
