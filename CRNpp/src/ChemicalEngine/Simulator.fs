@@ -7,13 +7,13 @@ module Simulator =
         let rateProduct solution (reactants:Reactants) = 
             reactants 
              |> List.map (fun n -> Map.find n solution)
-             |> List.fold (fun acc (C(_,c,m)) -> acc * (c ** m)) 1.0 
+             |> List.fold (fun acc (S(_,c,m)) -> acc * (c ** m)) 1.0 
 
         let netChange (name:Name) (solution: Solution) (reactants:Reactants) (products:Products) :float = 
             let change (name:Name) (solution:Solution) (cs:Name list) = 
                 List.filter (fun n -> n = name) cs
                 |> List.map (fun n -> Map.find n solution)
-                |> List.map (fun (C(_,_,m)) -> m)
+                |> List.map mult
                 |> List.sum 
                 |> float
 
@@ -26,21 +26,22 @@ module Simulator =
         reactions |> List.map (summands name solution) |> List.sum |> float
 
     let update crn =
-        let updateChemical crn (C(n,c,m)) = 
-            let concentationChange = dS crn n
-            C(n, c + concentationChange, m)
+        let updateChemical crn (S(n,c,m)) =
+            let updatedConcentration = max 0.0 (c + dS crn n)
+            S(n, updatedConcentration, m)
 
         let updatedSolution = Map.map(fun _ chemical -> updateChemical crn chemical) (snd crn)
         in (fst crn, updatedSolution)
 
     let runToStable (tolerance:float) (crn:CRN) = 
         let stable (current:Solution) (next:Solution) (tolerance:float) =
-            let stableConcentrations (C(_,c1,_)) (C(_,c2,_)) =
+            let stableConcentrations (S(_,c1,_)) (S(_,c2,_)) =
                 abs (c2-c1) < tolerance
             in Map.forall (fun name chemical -> stableConcentrations chemical (Map.find name next)) current
 
         let rec runner crn tolerance n maxUpdates = 
             let next = update crn
+            // printfn "Next: %A" (snd next |> Map.values |> Seq.toList)
             if (n = maxUpdates || stable (snd crn) (snd next) tolerance) 
             then next
             else runner next tolerance (n+1) maxUpdates

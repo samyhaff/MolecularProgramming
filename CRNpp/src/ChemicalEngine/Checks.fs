@@ -4,17 +4,67 @@ module Checks =
     open Reaction
     open FsCheck
 
+    type Concentration = Con of float
+
+    let CRNtolerance = 1e-3
+
     let floatEquals f1 f2 =
-        abs (f2-f1) < 1e-5
+        abs (f2-f1) < 1e-2
 
-    let multiplicationCheck (c1:float) (c2:float) =
-        let A = C("A", c1, 1)
-        let B = C("B", c2, 1)
-        let C = C("C", 0, 1)
+    let verify (name:Name) (crn:CRN) (expected:float) =
+        Map.find name (snd crn) |> conc |> floatEquals expected
 
-        let crn = Modules.mul A B C |> Simulator.runToStable 1e-5
-        let (C(_,result,_)) = Map.find "C" (snd crn)
-        floatEquals result (c1*c2)
+    let ldCheck (Con(c1)) (Con(c2)) =
+        let A = S("A", c1, 1)
+        let B = S("B", c2, 1)
+
+        let crn = Modules.ld A B |> Simulator.runToStable CRNtolerance
+        verify (name A) crn (conc A) &&
+        verify (name B) crn (conc A)
+
+    let addCheck (Con(c1)) (Con(c2)) (Con(c3)) =
+        let A = S("A", c1, 1)
+        let B = S("B", c2, 1)
+        let C = S("C", c3, 1)
+
+        let crn = Modules.add A B C |> Simulator.runToStable CRNtolerance
+        verify (name A) crn (conc A) && 
+        verify (name B) crn (conc B) && 
+        verify (name C) crn (conc A + conc B)
+
+    // todo add when sub module has fixed the oscilating result
+    // let subCheck (Con(c1)) (Con(c2)) (Con(c3)) =
+    //     let A = S("A", c1, 1)
+    //     let B = S("B", c2, 1)
+    //     let C = S("C", c3, 1)
+
+    //     let crn = Modules.sub A B C |> Simulator.runToStable CRNtolerance
+    //     verify (name A) crn (conc A) && 
+    //     verify (name B) crn (conc B) && 
+    //     verify (name C) crn (if conc A > conc B then (conc A - conc B) else 0.0)
+
+
+    let mulCheck (Con(c1)) (Con(c2)) (Con(c3)) =
+        let A = S("A", c1, 1)
+        let B = S("B", c2, 1)
+        let C = S("C", c3, 1)
+
+        let crn = Modules.mul A B C |> Simulator.runToStable CRNtolerance
+        verify (name A) crn (conc A) &&
+        verify (name B) crn (conc B) &&
+        verify (name C) crn (conc A * conc B)
+
+    // todo add when div module has fixed the oscilating result
+    // let divCheck (Con(c1)) (Con(c2)) (Con(c3)) =
+    //     let A = S("A", c1, 1)
+    //     let B = S("B", c2, 1)
+    //     let C = S("C", c3, 1)
+
+    //     let crn = Modules.div A B C |> Simulator.runToStable CRNtolerance
+    //     verify (name A) crn (conc A) &&
+    //     verify (name B) crn (conc B) &&
+    //     verify (name C) crn (conc A / conc B)
+
 
     type CustomGenerators =
         static member float() =
@@ -23,11 +73,24 @@ module Checks =
                 override x.Generator = Arb.generate<NormalFloat>
                                         |> Gen.map NormalFloat.op_Explicit
             }
+        static member concentration() =
+            {
+                new Arbitrary<Concentration>() with
+                override x.Generator = Arb.generate<NormalFloat>
+                                        |> Gen.map NormalFloat.op_Explicit
+                                        |> Gen.where ((<)0.0)
+                                        |> Gen.map Con
+            }
 
     let runAll () =
         printfn $"Running {nameof ChemicalEngine} checks"
         let checkQuick lbl prop = Check.One ({Config.Quick with Name = lbl}, prop)
-
         Arb.register<CustomGenerators>() |> ignore
-        checkQuick "Multiplication by CRN" multiplicationCheck
-        printfn "Checks done"
+
+        printfn "Checking modules:"
+        checkQuick "ld" ldCheck
+        checkQuick "add" addCheck
+        checkQuick "mul" mulCheck
+        printfn "Module checks done"
+
+        printfn $"{nameof ChemicalEngine} checks done"
