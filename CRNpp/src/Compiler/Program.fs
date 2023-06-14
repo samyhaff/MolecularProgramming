@@ -1,5 +1,6 @@
 open System
 open Parser
+open TypeChecker
 
 [<EntryPoint>]
 let main argv =
@@ -9,5 +10,7 @@ let main argv =
       1
    else
       let code = IO.File.ReadAllText(argv.[1])
-      test pcrn code
+      let program = parse code
+      printfn "%A" program
+      printfn "%A" (checkProgram program)
       0

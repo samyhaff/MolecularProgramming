@@ -94,6 +94,11 @@ let proots: Parser<Root list> =
 let pcrn: Parser<Crn> =
    skipString "crn" >>. ws >>. skipChar '=' >>. ws >>. between (skipChar '{' >>. ws) (ws >>. skipChar '}') proots .>> ws .>> eof
 
+let parse string =
+   match run pcrn string with
+   | Success(result, _, _) -> result
+   | Failure(errorMsg, _, _) -> failwith errorMsg
+
 let test p string =
    match run p string with
    | Success(result, _, _) -> printfn "%A" result
