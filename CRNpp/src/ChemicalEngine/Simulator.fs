@@ -44,7 +44,6 @@ module Simulator =
 
     let rec watch (steps:int) (crn:CRN) = 
         let names = fst crn |> List.collect (fun (r,_,p) -> r @ p) |> Set.ofList
-        printfn "Names: %A" names
 
         let rec simulate crn = 
             seq {yield crn; yield! simulate (update crn)}
