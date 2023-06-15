@@ -64,3 +64,17 @@ let sqrt () =
 
     let data = Modules.sqrt A B |> watch
     data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "sqrt"
+
+let clock phases =
+    let time = 100
+    let xs = Seq.initInfinite (fun i -> float i * CRNresolution) 
+                |> Seq.takeWhile (fun x -> x < time)
+                |> Seq.toList
+
+    let crn = Modules.clock phases
+    printfn "reactions: %A" (fst crn)
+    printfn "solution: %A" (snd crn)
+
+    Simulator.watch CRNresolution (List.length xs) crn 
+        |> List.map (fun (n, ys) -> scatter xs ys n) 
+        |> show "clock"

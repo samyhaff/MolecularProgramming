@@ -1,10 +1,18 @@
 ﻿open System
 open Parser
+open ChemicalEngine
 
 [<EntryPoint>]
 let main argv =
    let programName = AppDomain.CurrentDomain.FriendlyName
    if argv.Length = 0 then
+      // Checks.runAll ()
+      // let a,b,c = ("A", 72.23127391), ("B", 71.8824643), ("C", 24.83549962)
+      // ModuleExamples.watchModule (fun () -> Modules.sub a b c) "sub test"
+      
+      ModuleExamples.clock 8
+      
+
       printfn "Usage: %s <filename>" programName
       1
    else

@@ -34,14 +34,14 @@ module Simulator =
         in (fst crn, updatedSolution)
         
 
-    let extractConcentrations (names:ReactionComponent Set) (steps:int) (crn:CRN seq) =
+    let extractConcentrations (names:Name Set) (steps:int) (crn:CRN seq) =
         let slns = Seq.take steps crn |> Seq.map snd |> Seq.toList
-        List.map (fun (n,_) -> 
+        List.map (fun n -> 
             (n, slns |> List.map (fun s -> Map.find n s |> conc))
         ) (Set.toList names)
 
     let rec watch (resolution:float) (steps:int) (crn:CRN) = 
-        let names = fst crn |> List.collect (fun (r,_,p) -> r @ p) |> Set.ofList
+        let names = fst crn |> List.collect (fun (r,_,p) -> r @ p) |> List.map fst |> Set.ofList
 
         let rec simulate crn = 
             seq {yield crn; yield! simulate (update crn resolution)}
