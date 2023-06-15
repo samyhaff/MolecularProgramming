@@ -23,7 +23,6 @@ module Modules =
 
         toCRN reactions [A;B;C]
 
-    // todo fix oscilating result
     let sub A B C =
         let rate = 1.0
 
@@ -47,7 +46,6 @@ module Modules =
 
         toCRN reactions [A;B;C]
 
-    // todo fix oscilating result
     let div A B C =
         let rate = 1.0
         let reactions :Reaction list= [
