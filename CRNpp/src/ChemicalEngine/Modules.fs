@@ -8,17 +8,17 @@ module Modules =
     let ld A B =
         let rate = 1.0
         let reactions :Reaction list= [
-            ([name A], rate, [name A; name B]);
-            ([name B], rate, []);
+            ([name A, 1], rate, [name A, 1; name B, 1]);
+            ([name B, 1], rate, []);
         ]
         toCRN reactions [A;B]
 
     let add A B C =
         let rate = 1.0
         let reactions :Reaction list= [
-            ([name A], rate, [name A; name C]);
-            ([name B], rate, [name B; name C]);
-            ([name C], rate, [])
+            ([name A, 1], rate, [name A, 1; name C, 1]);
+            ([name B, 1], rate, [name B, 1; name C, 1]);
+            ([name C, 1], rate, [])
         ]
 
         toCRN reactions [A;B;C]
@@ -27,12 +27,12 @@ module Modules =
         let rate = 1.0
 
         // todo manage aux chemical names: H
-        let H = S("H", 0.0, 1)
+        let H = ("H", 0.0)
         let reactions :Reaction list= [
-            ([name A], rate, [name A; name C]);
-            ([name B], rate, [name B; name H]);
-            ([name C], rate, [])
-            ([name C; name H], rate, [])
+            ([name A, 1], rate, [name A, 1; name C, 1]);
+            ([name B, 1], rate, [name B, 1; name H, 1]);
+            ([name C, 1], rate, [])
+            ([name C, 1; name H, 1], rate, [])
         ]
 
         toCRN reactions [A;B;C;H]
@@ -40,8 +40,8 @@ module Modules =
     let mul A B C =
         let rate = 1.0
         let reactions :Reaction list= [
-            ([name A; name B], rate, [name A; name B; name C]);
-            ([name C], rate, [])
+            ([name A, 1; name B, 1], rate, [name A, 1; name B, 1; name C, 1]);
+            ([name C, 1], rate, [])
         ]
 
         toCRN reactions [A;B;C]
@@ -49,8 +49,8 @@ module Modules =
     let div A B C =
         let rate = 1.0
         let reactions :Reaction list= [
-            ([name A], rate, [name A; name C]);
-            ([name B; name C], rate, [name B])
+            ([name A, 1], rate, [name A, 1; name C, 1]);
+            ([name B, 1; name C, 1], rate, [name B, 1])
         ]
 
         toCRN reactions [A;B;C]
@@ -58,8 +58,8 @@ module Modules =
 
     let sqrt A B =
         let reactions :Reaction list= [
-            ([name A], 1.0, [name A; name B]);
-            ([name B; name B], 0.5, [])
+            ([name A, 1], 1.0, [name A, 1; name B, 1]);
+            ([name B, 2], 0.5, [])
         ]
 
         toCRN reactions [A;B]

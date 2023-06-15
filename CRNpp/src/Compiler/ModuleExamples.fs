@@ -5,20 +5,20 @@ open Reaction
 open Rendering.Plotting
 
 let subAgtB () = 
-    let A = S("A", 10.0, 1)
-    let B = S("B", 8.0, 1)
-    let C = S("C", 0.0, 1)
+    let A = ("A", 10.0)
+    let B = ("B", 8.0)
+    let C = ("C", 0.0)
 
-    let n = 100
+    let n = 200
     let data = Modules.sub A B C |> Simulator.watch n
 
     let xs = [1..n] |> List.map float
     data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "sub with A > B"
 
 let subAltB () = 
-    let A = S("A", 2.0, 1)
-    let B = S("B", 8.0, 1)
-    let C = S("C", 0.0, 1)
+    let A = ("A", 2.0)
+    let B = ("B", 8.0)
+    let C = ("C", 0.0)
 
     let n = 100
     let data = Modules.sub A B C |> Simulator.watch n
@@ -27,9 +27,9 @@ let subAltB () =
     data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "sub with A < B"
 
 let add () = 
-    let A = S("A", 2.0, 1)
-    let B = S("B", 8.0, 1)
-    let C = S("C", 0.0, 1)
+    let A = ("A", 2.0)
+    let B = ("B", 8.0)
+    let C = ("C", 0.0)
 
     let n = 100
     let data = Modules.add A B C |> Simulator.watch n
@@ -38,9 +38,9 @@ let add () =
     data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "add"
 
 let mul () = 
-    let A = S("A", 2.0, 1)
-    let B = S("B", 8.0, 1)
-    let C = S("C", 0.0, 1)
+    let A = ("A", 2.0)
+    let B = ("B", 8.0)
+    let C = ("C", 0.0)
 
     let n = 100
     let data = Modules.mul A B C |> Simulator.watch n
@@ -49,9 +49,9 @@ let mul () =
     data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "mul"
 
 let div () = 
-    let A = S("A", 8.0, 1)
-    let B = S("B", 2.0, 1)
-    let C = S("C", 0.0, 1)
+    let A = ("A", 8.0)
+    let B = ("B", 2.0)
+    let C = ("C", 0.0)
 
     let n = 100
     let data = Modules.div A B C |> Simulator.watch n
@@ -61,8 +61,8 @@ let div () =
 
 
 let sqrt () =
-    let A = S("A", 16.0, 1)
-    let B = S("B", 0.0, 1)
+    let A = ("A", 16.0)
+    let B = ("B", 0.0)
 
     let n = 100
     let data = Modules.sqrt A B |> Simulator.watch n
