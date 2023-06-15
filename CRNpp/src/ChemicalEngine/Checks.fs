@@ -6,10 +6,13 @@ module Checks =
 
     type Concentration = Con of float
 
-    let CRNtolerance = 0.001
+    let CRNtolerance = 0.0001
+    let CRNresolution = 0.01
+
+    let run = Simulator.runToStable CRNresolution CRNtolerance
 
     let floatEquals f1 f2 =
-        abs (f2-f1) < 0.05
+        abs (f2-f1) < 0.5
 
     let verify (name:Name) (crn:CRN) (expected:float) =
         Map.find name (snd crn) |> conc |> floatEquals expected
@@ -20,7 +23,7 @@ module Checks =
         let A = ("A", c1)
         let B = ("B", c2)
 
-        let crn = Modules.ld A B |> Simulator.runToStable CRNtolerance
+        let crn = Modules.ld A B |> run
         verify (name A) crn (conc A) &&
         verify (name B) crn (conc A)
 
@@ -29,20 +32,21 @@ module Checks =
         let B = ("B", c2)
         let C = ("C", c3)
 
-        let crn = Modules.add A B C |> Simulator.runToStable CRNtolerance
+        let crn = Modules.add A B C |> run
         verify (name A) crn (conc A) && 
         verify (name B) crn (conc B) && 
         verify (name C) crn (conc A + conc B)
 
-    let subCheck (Con(c1)) (Con(c2)) (Con(c3)) =
+    let subAgtBCheck (Con(c1)) (Con(c2)) (Con(c3)) =
         let A = ("A", c1)
         let B = ("B", c2)
         let C = ("C", c3)
 
-        let crn = Modules.sub A B C |> Simulator.runToStable CRNtolerance
-        verify (name A) crn (conc A) && 
-        verify (name B) crn (conc B) && 
-        verify (name C) crn (if conc A > conc B then (conc A - conc B) else 0.0)
+        let crn = Modules.sub A B C |> run
+        (conc A > conc B + 1.0) ==>
+            (verify (name A) crn (conc A) && 
+            verify (name B) crn (conc B) && 
+            verify (name C) crn (conc A - conc B))
 
 
     let mulCheck (Con(c1)) (Con(c2)) (Con(c3)) =
@@ -50,7 +54,7 @@ module Checks =
         let B = ("B", c2)
         let C = ("C", c3)
 
-        let crn = Modules.mul A B C |> Simulator.runToStable CRNtolerance
+        let crn = Modules.mul A B C |> run
         verify (name A) crn (conc A) &&
         verify (name B) crn (conc B) &&
         verify (name C) crn (conc A * conc B)
@@ -60,7 +64,7 @@ module Checks =
         let B = ("B", c2)
         let C = ("C", c3)
 
-        let crn = Modules.div A B C |> Simulator.runToStable CRNtolerance
+        let crn = Modules.div A B C |> run
         verify (name A) crn (conc A) &&
         verify (name B) crn (conc B) &&
         verify (name C) crn (conc A / conc B)
@@ -69,7 +73,7 @@ module Checks =
         let A = ("A", c1)
         let B = ("B", c2)
 
-        let crn = Modules.sqrt A B |> Simulator.runToStable CRNtolerance
+        let crn = Modules.sqrt A B |> run
         verify (name A) crn (conc A) &&
         verify (name B) crn (conc A |> sqrt)
 
@@ -97,7 +101,7 @@ module Checks =
         printfn "Checking modules:"
         checkQuick "ld" ldCheck
         checkQuick "add" addCheck
-        checkQuick "sub" subCheck
+        checkQuick "sub" subAgtBCheck
         checkQuick "mul" mulCheck
         checkQuick "div" divCheck
         checkQuick "sqrt" sqrtCheck

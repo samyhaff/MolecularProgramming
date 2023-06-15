@@ -3,7 +3,7 @@ namespace ChemicalEngine
 module Simulator =
     open Reaction
 
-    let dS ((reactions,solution):CRN) (name:Name) = 
+    let dS ((reactions,solution):CRN) (name:Name) (resolution: float)= 
         let rateProduct solution (reactants:Reactants) = 
             reactants 
              |> Seq.map (fun (n, m) -> (Map.find n solution, m))
@@ -23,11 +23,11 @@ module Simulator =
             let summand = rate * (netChange name reactants products) * (rateProduct solution reactants)
             summand
 
-        reactions |> Seq.map (summands name solution) |> Seq.sum |> float  |> (fun x -> x * 0.05)
+        reactions |> Seq.map (summands name solution) |> Seq.sum |> float  |> (fun x -> x * resolution)
 
-    let update crn =
+    let update crn resolution =
         let updateChemical crn (n,c) =
-            let updatedConcentration = max 0.0 (c + dS crn n)
+            let updatedConcentration = max 0.0 (c + dS crn n resolution)
             (n, updatedConcentration)
 
         let updatedSolution = Map.map(fun _ chemical -> updateChemical crn chemical) (snd crn)
@@ -40,26 +40,27 @@ module Simulator =
             (n, slns |> List.map (fun s -> Map.find n s |> conc))
         ) (Set.toList names)
 
-    let rec watch (steps:int) (crn:CRN) = 
+    let rec watch (resolution:float) (steps:int) (crn:CRN) = 
         let names = fst crn |> List.collect (fun (r,_,p) -> r @ p) |> Set.ofList
 
         let rec simulate crn = 
-            seq {yield crn; yield! simulate (update crn)}
+            seq {yield crn; yield! simulate (update crn resolution)}
 
         extractConcentrations names steps (simulate crn)
 
-    let runToStable (tolerance:float) (crn:CRN) = 
+    let runToStable (resolution:float) (tolerance:float) (crn:CRN) = 
         let stable (current:Solution) (next:Solution) (tolerance:float) =
             let stableConcentrations (_,c1) (_,c2) =
                 abs (c2-c1) < tolerance
             in Map.forall (fun name chemical -> stableConcentrations chemical (Map.find name next)) current
 
-        let rec runner crn tolerance n maxUpdates = 
-            let next = update crn
-            if (stable (snd crn) (snd next) tolerance) 
+        let rec runner crn resolution tolerance n maxUpdates = 
+            let next = update crn resolution
+            // if (stable (snd crn) (snd next) tolerance) 
+            // then next
+            // else if n = maxUpdates 
+            // then printfn "Max updates reached"
+            if n = maxUpdates
             then next
-            else if n = maxUpdates 
-            then printfn "Max updates reached"
-                 next
-            else runner next tolerance (n+1) maxUpdates
-        in runner crn tolerance 0 1_000
+            else runner next resolution tolerance (n+1) maxUpdates
+        in runner crn resolution tolerance 0 ((20.0/resolution) |> ceil |> int)
