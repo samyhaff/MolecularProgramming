@@ -14,8 +14,8 @@ let main argv =
       let program = parse code
       let n = 10
       let xs = [1..n] |> List.map float
-      Interperter.run program 
-         |> Interperter.envSeqToConc n
+      BasicInterperter.run program 
+         |> BasicInterperter.envSeqToConc n
          |> List.map (fun (n, ys) -> Rendering.Plotting.scatter xs ys n) 
          |> Rendering.Plotting.show "GCD basic interpreter"
       0

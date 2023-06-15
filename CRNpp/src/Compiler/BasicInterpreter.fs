@@ -1,4 +1,4 @@
-module Interperter
+module BasicInterperter
 open Ast
 
 type Flag = Greater | Equal | Less
