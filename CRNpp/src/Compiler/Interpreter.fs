@@ -60,3 +60,12 @@ let run (crn:Crn) =
         }
 
     runner env steps
+
+let envSeqToConc (steps:int) (envSeq: Env seq) =
+    let crns = Seq.take steps envSeq |> Seq.toList
+    let names = (List.head crns).variables |> Map.keys |> Seq.toList
+    let vars = List.map (fun crn -> crn.variables) crns
+    List.map ( fun n -> 
+        n, List.map (fun var -> Map.find n var) vars
+    ) names
+

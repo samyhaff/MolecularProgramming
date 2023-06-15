@@ -1,4 +1,4 @@
-open System
+﻿open System
 open Parser
 
 [<EntryPoint>]
@@ -10,4 +10,12 @@ let main argv =
    else
       let code = IO.File.ReadAllText(argv.[1])
       test pcrn code
+
+      let program = parse code
+      let n = 10
+      let xs = [1..n] |> List.map float
+      Interperter.run program 
+         |> Interperter.envSeqToConc n
+         |> List.map (fun (n, ys) -> Rendering.Plotting.scatter xs ys n) 
+         |> Rendering.Plotting.show "GCD basic interpreter"
       0
