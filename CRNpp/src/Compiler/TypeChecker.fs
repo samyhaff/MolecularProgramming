@@ -31,12 +31,14 @@ let rec checkModule (command: Command) (env: Env)=
       let (isValid, env') = checkModules commands env
       (env.flag = Set && isValid, env')
 and checkModules (commands: Command list) (env: Env) =
-   match commands with
-   | [] -> (true, env)
-   | command :: rest ->
-      let (isValid, env') = checkModule command env
-      let res = checkModules rest env'
-      (isValid && fst res, snd res)
+   let rec aux commands newEnv =
+      match commands with
+      | [] -> (true, newEnv)
+      | command :: rest ->
+         let (isValid, env') = checkModule command env
+         let res = aux rest {newEnv with flag = env'.flag; variables = Set.union newEnv.variables env'.variables}
+         (isValid && fst res, env')
+   aux commands env
 
 let checkProgram (program: Crn) =
    let rec aux program env =
