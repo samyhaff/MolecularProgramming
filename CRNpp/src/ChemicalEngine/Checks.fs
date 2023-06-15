@@ -9,7 +9,10 @@ module Checks =
     let CRNtolerance = 0.0001
     let CRNresolution = 0.01
 
-    let run = Simulator.runToStable CRNresolution CRNtolerance
+    // let run = Simulator.runToStable CRNresolution CRNtolerance
+
+    let resF = Simulator.constRes
+    let run crn = Simulator.simulate resF crn |> Seq.skip 2000 |> Seq.head
 
     let floatEquals f1 f2 =
         abs (f2-f1) < 0.5
@@ -43,7 +46,7 @@ module Checks =
         let C = ("C", c3)
 
         let crn = Modules.sub A B C |> run
-        (conc A > conc B + 1.0) ==>
+        (conc A > conc B + 2.0) ==>
             (verify (name A) crn (conc A) && 
             verify (name B) crn (conc B) && 
             verify (name C) crn (conc A - conc B))

@@ -93,12 +93,12 @@ module Modules =
 
     // todo why is it not oscillating???
     let clock phases =
-        let initClockSpecies i = if i = 1 || i = phases then ($"clc{i}", 0.5) else ($"clc{i}", 0.0)
+        let initClockSpecies i = if i = 1 || i = phases then ($"clc{i}", 1.0) else ($"clc{i}", 0.0)
         let clcs = [1..phases] |> List.map initClockSpecies
 
-        let clockReaction i1 i2 = 
-            let iCurrent, iNext = (i1 - 1) % phases, (i2 - 1) % phases
-            in ([name clcs[iCurrent], 1; name clcs[iNext], 1], 1.0, [name clcs[iNext], 2])
+        let clockReaction i =
+            let i1, i2 = (i - 1) % phases, (i) % phases
+            in ([name clcs[i1], 1; name clcs[i2], 1], 1.0, [name clcs[i2], 2])
 
-        let reactions = [1..phases] |> List.map (fun i -> clockReaction i (i+1)) 
+        let reactions = [1..phases] |> List.map clockReaction
         toCRN reactions clcs
