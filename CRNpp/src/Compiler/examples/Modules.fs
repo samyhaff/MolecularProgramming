@@ -75,3 +75,21 @@ module Modules =
         Simulator.watch resF (List.length xs) crn 
             |> List.map (fun (n, ys) -> scatter xs ys n) 
             |> show "clock"
+
+    let cmp () =
+        let A = ("A", 2.0)
+        let B = ("B", 5.0)
+
+        let crn = Modules.cmp A B
+        let formula = [
+            Reaction.Cmp(crn)
+        ]
+
+        let duration = 90.0
+        let xs = Seq.initInfinite steps 
+                    |> Seq.takeWhile (fun i -> i < duration)
+                    |> Seq.toList
+        let data = FakeClockSimulator.watchConstRes duration formula
+                    // |> FakeClockSimulator.filterNames ["cmpGt"; "cmpLt"; "cmpTmp"]
+
+        data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "cmp"

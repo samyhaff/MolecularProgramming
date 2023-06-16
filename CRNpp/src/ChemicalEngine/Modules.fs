@@ -27,11 +27,11 @@ module Modules =
 
         toCRN reactions [A;B;C]
 
+    let subTmpName = "subTmp"
     let sub A B C =
         let rate = 1.0
 
-        // todo manage aux chemical names: H
-        let H = ("H", 0.0)
+        let H = (subTmpName, 0.0)
         let reactions = mapReactions [
             ([A], rate, [A; C]);
             ([B], rate, [B; H]);
@@ -68,28 +68,34 @@ module Modules =
 
         toCRN reactions [A;B]
 
-    // todo requires sequential execution for phase two
-    // let cmp X Y =
-    //     let rate = 1.0
+    let cmpGtName = "cmpGt"
+    let cmpLtName = "cmpLt"
+    let cmpTmpName = "cmpTmp"
 
-    //     // phase 1:
-    //     let gt = ("cmpGt", 0.5)
-    //     let lt = ("cmpLt", 0.5)
-    //     let reactions = mapReactions [
-    //         ([gt; Y], rate, [lt; Y]);
-    //         ([lt; X], rate, [gt; X]);
-    //     ]
+    let cmp X Y =
+        let rate = 1.0
 
-    //     // phase 2:
-    //     let B = ("cmpTmp", 0.0)
-    //     let reactions = mapReactions [
-    //         ([gt; lt], rate, [lt; B ]);
-    //         ([B ; lt], rate, [lt; lt]);
-    //         ([lt; gt], rate, [gt; B ]);
-    //         ([B ; gt], rate, [gt; gt]);
-    //     ]
+        let gt = (cmpGtName, 0.5)
+        let lt = (cmpLtName, 0.5)
+        let reactions = mapReactions [
+            ([gt; Y], rate, [lt; Y]);
+            ([lt; X], rate, [gt; X]);
+        ]
+        toCRN reactions [X;Y;gt;lt]
 
-    //     toCRN reactions [X;Y;gt;lt]
+    let cmpPhase2 () =
+        let gt = cmpGtName
+        let lt = cmpLtName
+        let B = cmpTmpName
+        let rate = 1.0
+        let reactions = [
+            ([gt; lt], rate, [lt; B ]);
+            ([B ; lt], rate, [lt; lt]);
+            ([lt; gt], rate, [gt; B ]);
+            ([B ; gt], rate, [gt; gt]);
+        ]
+
+        (reactions, [(B, 0.0)])
 
     // todo why is it not oscillating???
     let clock phases =
