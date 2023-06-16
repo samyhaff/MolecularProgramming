@@ -95,11 +95,12 @@ module Modules =
     let clock phases =
 
         let initClockSpecies i = (Clock.clockSpeciesName i, Clock.clockSpeciescConc phases i)
-        let clcs = [1..phases] |> List.map initClockSpecies
+        let phaseIndices = [0..phases-1]
+        let clcs = phaseIndices |> List.map initClockSpecies
 
         let clockReaction i =
-            let i1, i2 = (i - 1) % phases, (i) % phases
+            let i1, i2 = (i) % phases, (i+1) % phases
             in ([name clcs[i1], 1; name clcs[i2], 1], 1.0, [name clcs[i2], 2])
 
-        let reactions = [1..phases] |> List.map clockReaction
+        let reactions = phaseIndices |> List.map clockReaction
         toCRN reactions clcs

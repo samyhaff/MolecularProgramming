@@ -5,7 +5,7 @@ module FakeClockSimulator =
 
     let clockPhaseDuration = 20.0
     let private updateClockSpecies (clockPhases:int) time name =
-        let currentPhase = 1 + (int (time / clockPhaseDuration)) % clockPhases
+        let currentPhase = (int (time / clockPhaseDuration)) % clockPhases
         let conc' = if name = $"clc{currentPhase}" then 2.0 else 0.0
         conc'
 
