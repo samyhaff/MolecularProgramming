@@ -34,7 +34,6 @@ module Checks =
         verify (name B) crn (conc B) && 
         verify (name C) crn (conc A + conc B)
 
-    // todo add when sub module has fixed the oscilating result
     let subCheck (Con(c1)) (Con(c2)) (Con(c3)) =
         let A = S("A", c1, 1)
         let B = S("B", c2, 1)
@@ -56,17 +55,23 @@ module Checks =
         verify (name B) crn (conc B) &&
         verify (name C) crn (conc A * conc B)
 
-    // todo add when div module has fixed the oscilating result
-    // let divCheck (Con(c1)) (Con(c2)) (Con(c3)) =
-    //     let A = S("A", c1, 1)
-    //     let B = S("B", c2, 1)
-    //     let C = S("C", c3, 1)
+    let divCheck (Con(c1)) (Con(c2)) (Con(c3)) =
+        let A = S("A", c1, 1)
+        let B = S("B", c2, 1)
+        let C = S("C", c3, 1)
 
-    //     let crn = Modules.div A B C |> Simulator.runToStable CRNtolerance
-    //     verify (name A) crn (conc A) &&
-    //     verify (name B) crn (conc B) &&
-    //     verify (name C) crn (conc A / conc B)
+        let crn = Modules.div A B C |> Simulator.runToStable CRNtolerance
+        verify (name A) crn (conc A) &&
+        verify (name B) crn (conc B) &&
+        verify (name C) crn (conc A / conc B)
 
+    let sqrtCheck (Con(c1)) (Con(c2)) =
+        let A = S("A", c1, 1)
+        let B = S("B", c2, 1)
+
+        let crn = Modules.sqrt A B |> Simulator.runToStable CRNtolerance
+        verify (name A) crn (conc A) &&
+        verify (name B) crn (conc A |> sqrt)
 
     type CustomGenerators =
         static member float() =
@@ -94,6 +99,8 @@ module Checks =
         checkQuick "add" addCheck
         checkQuick "sub" subCheck
         checkQuick "mul" mulCheck
+        checkQuick "div" divCheck
+        checkQuick "sqrt" sqrtCheck
         printfn "Module checks done"
 
         printfn $"{nameof ChemicalEngine} checks done"

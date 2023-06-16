@@ -58,3 +58,14 @@ let div () =
 
     let xs = [1..n] |> List.map float
     data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "div"
+
+
+let sqrt () =
+    let A = S("A", 16.0, 1)
+    let B = S("B", 0.0, 1)
+
+    let n = 100
+    let data = Modules.sqrt A B |> Simulator.watch n
+
+    let xs = [1..n] |> List.map float
+    data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "sqrt"
