@@ -43,7 +43,6 @@ module FakeClockSimulator =
     let private addOffPeriodClockSpecies clockPhases crn :CRN =
         let offPeriodSpecies = 
             Seq.initInfinite id
-                |> Seq.skip 1
                 |> Seq.take clockPhases
                 |> Seq.filter (fun i -> not <| Map.containsKey (Clock.clockSpeciesName i) (snd crn))
                 |> Seq.map (Clock.clockSpecies clockPhases)
