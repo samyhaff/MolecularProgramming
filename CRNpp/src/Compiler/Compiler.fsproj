@@ -6,7 +6,8 @@
   <ItemGroup>
     <Compile Include="Ast.fs" />
     <Compile Include="Parser.fs" />
-    <Compile Include="ModuleExamples.fs" />
+    <Compile Include="examples\Modules.fs" />
+    <Compile Include="examples\Clocks.fs" />
     <Compile Include="BasicInterpreter.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
