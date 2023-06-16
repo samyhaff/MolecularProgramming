@@ -6,6 +6,8 @@
   <ItemGroup>
     <Compile Include="Clock.fs" />
     <Compile Include="Reaction.fs" />
+    <Compile Include="CRN.fs" />
+    <Compile Include="Command.fs" />
     <Compile Include="Simulator.fs" />
     <Compile Include="Modules.fs" />
     <Compile Include="FakeClockSimulator.fs" />

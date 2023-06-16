@@ -16,14 +16,10 @@ module Reaction =
     type Solution = Map<Name, Species>
     type CRN = Reaction list * Solution
 
-    type Step = | Cmp of CRN | Normal of CRN
+    type Command = | Cmp of CRN | Normal of CRN | Nested of Command list
+    type Step = Command list
     type Formula = Step list
 
     let name (n,_) :Name= n
     let conc ((_,c):Species) = c
     let mult ((_,m):ReactionComponent) = m
-
-
-    let toCRN (reactions:Reaction list) (chemicals:Species list) :CRN =
-        let solution = List.map (fun c -> name c, c) chemicals |> Map.ofList
-        (reactions, solution)

@@ -4,6 +4,7 @@ namespace ChemicalEngine
 
 module Modules =
     open Reaction
+    open CRN
 
     // todo add input restrictions
     let private mapReactions rs :Reaction list=
@@ -17,7 +18,7 @@ module Modules =
             ([A], rate, [A; B]);
             ([B], rate, []);
         ]
-        toCRN reactions [A;B]
+        fromReactionAndSpecies reactions [A;B] |> Normal
 
     let add A B C =
         let rate = 1.0
@@ -27,7 +28,7 @@ module Modules =
             ([C], rate, [])
         ]
 
-        toCRN reactions [A;B;C]
+        fromReactionAndSpecies reactions [A;B;C] |> Normal
 
     let subTmpName = "subTmp"
     let sub A B C =
@@ -41,7 +42,7 @@ module Modules =
             ([C; H], rate, [])
         ]
 
-        toCRN reactions [A;B;C;H]
+        fromReactionAndSpecies reactions [A;B;C;H] |> Normal
 
     let mul A B C =
         let rate = 1.0
@@ -50,7 +51,7 @@ module Modules =
             ([C], rate, [])
         ]
 
-        toCRN reactions [A;B;C]
+        fromReactionAndSpecies reactions [A;B;C] |> Normal
 
     let div A B C =
         let rate = 1.0
@@ -59,7 +60,7 @@ module Modules =
             ([B; C], rate, [B])
         ]
 
-        toCRN reactions [A;B;C]
+        fromReactionAndSpecies reactions [A;B;C] |> Normal
 
 
     let sqrt A B =
@@ -68,7 +69,7 @@ module Modules =
             ([name B, 2], 0.5, [])
         ]
 
-        toCRN reactions [A;B]
+        fromReactionAndSpecies reactions [A;B] |> Normal
 
     let cmpGtName = "cmpGt"
     let cmpLtName = "cmpLt"
@@ -83,9 +84,9 @@ module Modules =
             ([gt; Y], rate, [lt; Y]);
             ([lt; X], rate, [gt; X]);
         ]
-        toCRN reactions [X;Y;gt;lt]
+        fromReactionAndSpecies reactions [X;Y;gt;lt] |> Cmp
 
-    let cmpPhase2 () =
+    let cmpPhase2ReactionTemplate () =
         let gt = cmpGtName
         let lt = cmpLtName
         let B = cmpTmpName
@@ -99,6 +100,31 @@ module Modules =
 
         (reactions, [(B, 0.0)])
 
+    let private addCatalysts (catalysts:Name list) (reactions:Reaction list) =
+        let addCatalystsToComponents components =
+            List.map (fun n -> (n, 1)) catalysts @ components
+        in List.map (fun (reactants, rate, products) -> 
+                addCatalystsToComponents reactants, rate, addCatalystsToComponents products) reactions
+
+    let private applyCatalystsToCmds catalysts commands =
+        let rec applyCatalystsToCmd cmd :Command= 
+            match cmd with
+            | Normal (r,s) -> Normal (addCatalysts catalysts r, s)
+            | Cmp (r,s) -> Normal (addCatalysts catalysts r, s)
+            | Nested cmds -> Nested (List.map applyCatalystsToCmd cmds)
+        in List.map applyCatalystsToCmd commands
+
+    let ifGt (commands:Command list) =
+        let catalysts = [cmpGtName]
+        in applyCatalystsToCmds catalysts commands
+            |> Nested
+
+    let ifLt (commands:Command list) =
+        let catalysts = [cmpLtName]
+        in applyCatalystsToCmds catalysts commands
+            |> Nested
+
+
     // todo why is it not oscillating???
     let clock phases =
 
@@ -111,4 +137,4 @@ module Modules =
             in ([name clcs[i1], 1; name clcs[i2], 1], 1.0, [name clcs[i2], 2])
 
         let reactions = phaseIndices |> List.map clockReaction
-        toCRN reactions clcs
+        fromReactionAndSpecies reactions clcs

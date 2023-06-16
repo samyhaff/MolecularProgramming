@@ -13,8 +13,8 @@ module Clocks =
       let C = ("C", 0.0)
       let species = [A;B;C]
       let formula :Formula= [
-          Normal (toCRN [([name A, 1], 1.0, [name A, 1; name B, 1])] species);
-          Normal ( toCRN [([name A, 1], 1.0, [name A, 1; name C, 1])] species);
+          [Normal (CRN.fromReactionAndSpecies [([name A, 1], 1.0, [name A, 1; name B, 1])] species)];
+          [Normal (CRN.fromReactionAndSpecies [([name A, 1], 1.0, [name A, 1; name C, 1])] species)];
       ]
 
       let stepCount = List.length formula

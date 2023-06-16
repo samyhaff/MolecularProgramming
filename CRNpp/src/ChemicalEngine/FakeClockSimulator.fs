@@ -66,7 +66,7 @@ module FakeClockSimulator =
 
         let addCmpPhase2 (crn:CRN) :CRN =
             let phase2ClockSpecies = Clock.clockSpecies clockPhases (activePhase+1)
-            let (reactions, species) = Modules.cmpPhase2()
+            let (reactions, species) = Modules.cmpPhase2ReactionTemplate()
             let mapToComponents names :ReactionComponent list = 
                 List.map (fun n -> (n,1)) names
 
@@ -79,35 +79,33 @@ module FakeClockSimulator =
             let solution' = List.fold (fun m s -> Map.add (name s) s m) (snd crn) species
             (fst crn @ reactions', solution')
 
-        match step with 
-        | Normal (crn) -> augmentCRN crn
-        | Cmp (crn) -> augmentCRN crn |> addCmpPhase2
-
-    let private mergeSteps (crns:CRN list) :CRN=
-        let reactions = List.collect fst crns
-        let mapUnion m1 m2 = Map.fold (fun m k v -> Map.add k v m) m1 m2
-        let solution = List.fold mapUnion Map.empty (List.map snd crns)
-        (reactions, solution)
+        let crn = List.map Command.toCRN step |> CRN.collect
+        if List.exists Command.containsCmp step 
+        then augmentCRN crn |> addCmpPhase2
+        else augmentCRN crn
 
     let private ofFormula clockPhases (formula:Formula) =
-        List.mapi (appendClockSpecies clockPhases) formula  |> mergeSteps |> addOffPeriodClockSpecies clockPhases
+        List.mapi (appendClockSpecies clockPhases) formula  |> CRN.collect |> addOffPeriodClockSpecies clockPhases
 
 
-    let private watchWithClock clockPhases resF timeF duration crn =
+    let simulateFormula resF timeF (formula:Formula) =
+        let clockPhases = Clock.stepPeriod * (List.length formula)
+        let crn = ofFormula clockPhases formula
         let names = snd crn |> Map.keys |> Set.ofSeq
-        extractConcentrations names timeF duration (simulate clockPhases resF timeF crn)
+        names, simulate clockPhases resF timeF crn
+
+    let simulateFormulaConstRes formula =
+        simulateFormula Simulator.constRes Simulator.constResTime formula
 
     let watch resF timeF duration (formula:Formula) = 
-        let clockPhases = Clock.stepPeriod * (List.length formula)
-        let combinedCrn = ofFormula clockPhases formula
-        watchWithClock clockPhases resF timeF duration combinedCrn
+        let (names, crns) = simulateFormula resF timeF formula
+        extractConcentrations names timeF duration crns
 
     let watchConstRes duration formula =
         watch Simulator.constRes Simulator.constResTime duration formula
 
     let filterClockSpecies data =
         List.filter (fst >> Clock.isClockSpecies >> not) data
-
 
     let filterNames names data =
         List.filter (fun (n, _) -> List.contains n names) data

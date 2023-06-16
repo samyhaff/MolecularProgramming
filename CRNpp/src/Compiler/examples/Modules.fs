@@ -5,6 +5,7 @@ namespace Examples
 module Modules =
 
     open ChemicalEngine
+    open Reaction
     open Rendering.Plotting
 
     let private resF = Simulator.constRes
@@ -15,10 +16,13 @@ module Modules =
                     |> Seq.takeWhile (fun i -> i < n)
                     |> Seq.toList
 
-    let private watch = Simulator.watch resF (List.length xs)
+    // let private watch = Simulator.watch resF (List.length xs)
+    let private watch = FakeClockSimulator.watchConstRes n
+    let private cmdToFormula cmd :Formula = [[cmd]]
+    let private watchCmd = cmdToFormula >> watch
 
     let watchModule moduleF label =
-        let data = moduleF () |> watch
+        let data = moduleF () |> watchCmd
         data |> List.map (fun (n, ys) -> scatter xs ys n) |> show label
 
     let subAgtB () = 
@@ -26,7 +30,7 @@ module Modules =
         let B = ("B", 8.0)
         let C = ("C", 0.0)
 
-        let data = Modules.sub A B C |> watch
+        let data = Modules.sub A B C |> watchCmd
         data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "sub with A > B"
 
     let subAltB () = 
@@ -34,7 +38,7 @@ module Modules =
         let B = ("B", 8.0)
         let C = ("C", 0.0)
 
-        let data = Modules.sub A B C |> watch
+        let data = Modules.sub A B C |> watchCmd
         data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "sub with A < B"
 
     let add () = 
@@ -42,7 +46,7 @@ module Modules =
         let B = ("B", 8.0)
         let C = ("C", 0.0)
 
-        let data = Modules.add A B C |> watch
+        let data = Modules.add A B C |> watchCmd
         data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "add"
 
     let mul () = 
@@ -50,7 +54,7 @@ module Modules =
         let B = ("B", 8.0)
         let C = ("C", 0.0)
 
-        let data = Modules.mul A B C |> watch
+        let data = Modules.mul A B C |> watchCmd
         data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "mul"
 
     let div () = 
@@ -58,7 +62,7 @@ module Modules =
         let B = ("B", 2.0)
         let C = ("C", 0.0)
 
-        let data = Modules.div A B C |> watch
+        let data = Modules.div A B C |> watchCmd
         data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "div"
 
 
@@ -66,7 +70,7 @@ module Modules =
         let A = ("A", 16.0)
         let B = ("B", 0.0)
 
-        let data = Modules.sqrt A B |> watch
+        let data = Modules.sqrt A B |> watchCmd
         data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "sqrt"
 
     let clock phases =
@@ -82,10 +86,7 @@ module Modules =
         let A = ("A", 2.0)
         let B = ("B", 5.0)
 
-        let crn = Modules.cmp A B
-        let formula = [
-            Reaction.Cmp(crn)
-        ]
+        let formula = Modules.cmp A B |> cmdToFormula
 
         let duration = 90.0
         let xs = Seq.initInfinite steps 
@@ -93,3 +94,24 @@ module Modules =
                     |> Seq.toList
         let data = FakeClockSimulator.watchConstRes duration formula
         data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "cmp"
+
+    let ifGt () =
+        let A = ("A", 5.0)
+        let B = ("B", 8.0)
+        let C = ("C", 0.0)
+
+        let formula = [
+            [Modules.cmp A B];
+            [
+                Modules.ifGt [Modules.ld A C]; 
+                Modules.ifLt [Modules.ld B C]
+            ]
+        ]
+
+        let duration = 90.0
+        let xs = Seq.initInfinite steps 
+                    |> Seq.takeWhile (fun i -> i < duration)
+                    |> Seq.toList
+        let data = FakeClockSimulator.watchConstRes duration formula
+        data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "ifGt A > B -> C := A; A < B -> C := B"
+

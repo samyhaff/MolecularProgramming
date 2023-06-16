@@ -8,27 +8,31 @@ module Checks =
 
     type Concentration = Con of float
 
-    let CRNtolerance = 0.0001
-    let CRNresolution = 0.01
+    let private CRNtolerance = 0.0001
+    let private CRNresolution = 0.01
+
+    let private resF = Simulator.constRes
 
     // let run = Simulator.runToStable CRNresolution CRNtolerance
-
-    let resF = Simulator.constRes
-    let run crn = Simulator.simulate resF crn |> Seq.skip 2000 |> Seq.head
+    // let run crn = Simulator.simulate resF crn |> Seq.skip 2000 |> Seq.head
+    let private cmdToFormula cmd :Formula = [[cmd]]
+    let private runCmd = cmdToFormula
+                        >> FakeClockSimulator.simulateFormulaConstRes
+                        >> snd
+                        >> Seq.skip (Simulator.stepsInDuration FakeClockSimulator.clockPhaseDuration)
+                        >> Seq.head
 
     let floatEquals f1 f2 =
         abs (f2-f1) < 0.5
 
     let verify (name:Name) (crn:CRN) (expected:float) =
         Map.find name (snd crn) |> conc |> floatEquals expected
-    let concIn (crn:CRN) (s:Species) = 
-        Map.find (name s) (snd crn) |> conc
 
     let ldCheck (Con(c1)) (Con(c2)) =
         let A = ("A", c1)
         let B = ("B", c2)
 
-        let crn = Modules.ld A B |> run
+        let crn = Modules.ld A B |> runCmd
         verify (name A) crn (conc A) &&
         verify (name B) crn (conc A)
 
@@ -37,7 +41,7 @@ module Checks =
         let B = ("B", c2)
         let C = ("C", c3)
 
-        let crn = Modules.add A B C |> run
+        let crn = Modules.add A B C |> runCmd
         verify (name A) crn (conc A) && 
         verify (name B) crn (conc B) && 
         verify (name C) crn (conc A + conc B)
@@ -47,7 +51,7 @@ module Checks =
         let B = ("B", c2)
         let C = ("C", c3)
 
-        let crn = Modules.sub A B C |> run
+        let crn = Modules.sub A B C |> runCmd
         (conc A > conc B + 2.0) ==>
             (verify (name A) crn (conc A) && 
             verify (name B) crn (conc B) && 
@@ -59,7 +63,7 @@ module Checks =
         let B = ("B", c2)
         let C = ("C", c3)
 
-        let crn = Modules.mul A B C |> run
+        let crn = Modules.mul A B C |> runCmd
         verify (name A) crn (conc A) &&
         verify (name B) crn (conc B) &&
         verify (name C) crn (conc A * conc B)
@@ -69,7 +73,7 @@ module Checks =
         let B = ("B", c2)
         let C = ("C", c3)
 
-        let crn = Modules.div A B C |> run
+        let crn = Modules.div A B C |> runCmd
         verify (name A) crn (conc A) &&
         verify (name B) crn (conc B) &&
         verify (name C) crn (conc A / conc B)
@@ -78,7 +82,7 @@ module Checks =
         let A = ("A", c1)
         let B = ("B", c2)
 
-        let crn = Modules.sqrt A B |> run
+        let crn = Modules.sqrt A B |> runCmd
         verify (name A) crn (conc A) &&
         verify (name B) crn (conc A |> sqrt)
 

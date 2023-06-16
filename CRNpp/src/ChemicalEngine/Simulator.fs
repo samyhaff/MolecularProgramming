@@ -6,6 +6,7 @@ module Simulator =
     open Reaction
 
     let private defaultRes = 0.01
+    let stepsInDuration duration = duration / defaultRes |> ceil |> int
     let constResTime n = (float n) * defaultRes
     let constRes n = defaultRes
 

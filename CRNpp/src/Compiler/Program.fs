@@ -7,9 +7,10 @@ let main argv =
    if argv.Length = 0 then
       printfn "Usage: %s <filename>" programName
       printfn "Running checks..."
-      // Checks.runAll ()
-      Examples.Modules.cmp()
-      Examples.Clocks.fakeClock()
+      // ChemicalEngine.Checks.runAll ()
+      // Examples.Modules.cmp()
+      // Examples.Clocks.fakeClock()
+      Examples.Modules.ifGt ()
       0
    else
       let code = IO.File.ReadAllText(argv.[1])
