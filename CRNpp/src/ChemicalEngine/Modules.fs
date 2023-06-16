@@ -1,3 +1,5 @@
+// Author: Roar Nind Steffensen, 16/06/2023
+
 namespace ChemicalEngine
 
 module Modules =

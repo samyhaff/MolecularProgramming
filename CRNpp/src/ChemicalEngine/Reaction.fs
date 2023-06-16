@@ -1,3 +1,5 @@
+// Author: Roar Nind Steffensen, 13/06/2023
+
 namespace ChemicalEngine
 
 module Reaction =

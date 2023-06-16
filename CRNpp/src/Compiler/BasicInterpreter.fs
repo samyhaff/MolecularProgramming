@@ -1,3 +1,5 @@
+// Author: Roar Nind Steffensen, 15/06/2023
+
 module BasicInterperter
 open Ast
 

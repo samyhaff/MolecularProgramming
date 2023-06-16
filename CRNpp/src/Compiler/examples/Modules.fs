@@ -1,3 +1,5 @@
+// Author: Roar Nind Steffensen, 14/06/2023
+
 namespace Examples
 
 module Modules =
