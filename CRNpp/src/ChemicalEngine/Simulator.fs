@@ -2,11 +2,12 @@ namespace ChemicalEngine
 
 module Simulator =
     open Reaction
-    let constRes n =
-        0.01
 
-    let expRes n =
-        2.0 ** (-(float n)/8.0)
+    let private defaultRes = 0.01
+    let constResTime n = (float n) * defaultRes
+    let constRes n = defaultRes
+
+    let expRes n = 2.0 ** (-(float n)/8.0)
 
     let dS ((reactions,solution):CRN) (name:Name) (resolution: float)= 
         let rateProduct solution (reactants:Reactants) = 
