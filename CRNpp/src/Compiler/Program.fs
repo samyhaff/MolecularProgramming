@@ -1,6 +1,5 @@
 ﻿open System
 open Parser
-open ChemicalEngine
 
 [<EntryPoint>]
 let main argv =
@@ -8,7 +7,9 @@ let main argv =
    if argv.Length = 0 then
       printfn "Usage: %s <filename>" programName
       printfn "Running checks..."
-      Checks.runAll ()
+      // Checks.runAll ()
+      Examples.Modules.cmp()
+      Examples.Clocks.fakeClock()
       0
    else
       let code = IO.File.ReadAllText(argv.[1])

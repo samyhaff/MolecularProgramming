@@ -99,7 +99,6 @@ module FakeClockSimulator =
     let watch resF timeF duration (formula:Formula) = 
         let clockPhases = Clock.stepPeriod * (List.length formula)
         let combinedCrn = ofFormula clockPhases formula
-        printfn "%A" (fst combinedCrn)
         watchWithClock clockPhases resF timeF duration combinedCrn
 
     let watchConstRes duration formula =

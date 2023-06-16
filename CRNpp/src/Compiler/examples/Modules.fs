@@ -90,6 +90,4 @@ module Modules =
                     |> Seq.takeWhile (fun i -> i < duration)
                     |> Seq.toList
         let data = FakeClockSimulator.watchConstRes duration formula
-                    // |> FakeClockSimulator.filterNames ["cmpGt"; "cmpLt"; "cmpTmp"]
-
         data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "cmp"
