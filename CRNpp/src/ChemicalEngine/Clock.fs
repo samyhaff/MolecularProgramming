@@ -1,7 +1,7 @@
 namespace ChemicalEngine
 
 module Clock =
-    let stepPeriod = 3
+    let stepPeriod = 2
 
     let isClockSpecies (name:string) =
         name.StartsWith("clc")
