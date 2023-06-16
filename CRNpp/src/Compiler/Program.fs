@@ -10,7 +10,11 @@ let main argv =
       // ChemicalEngine.Checks.runAll ()
       // Examples.Modules.cmp()
       // Examples.Clocks.fakeClock()
-      Examples.Modules.ifGt ()
+      // Examples.Modules.ifGt ()
+      // Examples.Modules.clock 3
+      // Examples.Formulas.factorial 5
+      // Examples.Formulas.eulersConstant ()
+      Examples.Formulas.pi ()
       0
    else
       let code = IO.File.ReadAllText(argv.[1])

@@ -8,6 +8,7 @@
     <Compile Include="Parser.fs" />
     <Compile Include="examples\Modules.fs" />
     <Compile Include="examples\Clocks.fs" />
+    <Compile Include="examples\Formulas.fs" />
     <Compile Include="BasicInterpreter.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

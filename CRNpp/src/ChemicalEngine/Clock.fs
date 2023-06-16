@@ -4,6 +4,7 @@ namespace ChemicalEngine
 
 module Clock =
     let stepPeriod = 2
+    let stepPeriodF = float stepPeriod
 
     let isClockSpecies (name:string) =
         name.StartsWith("clc")
