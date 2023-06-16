@@ -20,10 +20,6 @@ module FakeClockSimulator =
         let updatedSolution = Map.map (fun _ chemical -> updateChemical chemical) (snd crn)
         in (fst crn, updatedSolution)
         
-    let private addClock phases (crn:CRN) :CRN= 
-        let clock = Modules.clock phases
-        (fst crn @ fst clock, Map.fold (fun m k v -> Map.add k v m) (snd crn) (snd clock))
-        
     let private simulate clockPhases resF timeF (crn:CRN) :CRN seq = 
         let rec simulate' (crn:CRN) n =
             let next = update clockPhases crn (resF n) (timeF n)
@@ -42,11 +38,16 @@ module FakeClockSimulator =
         ) (Set.toList names)
 
     let private watchWithClock clockPhases resF timeF duration crn =
-        let names = fst crn |> List.collect (fun (r,_,p) -> r @ p) |> List.map fst |> Set.ofList
+        let names = snd crn |> Map.keys |> Set.ofSeq
         extractConcentrations names timeF duration (simulate clockPhases resF timeF crn)
 
-    let watch clockPhases resF timeF duration (crn:CRN) = 
-        watchWithClock clockPhases resF timeF duration (addClock clockPhases crn)
+    let watch resF timeF duration (crnSteps:CRN list) = 
+        let clockPhases = Clock.stepPeriod * List.length crnSteps
+        let combinedCrn = asStepsWithClockSpecies clockPhases crnSteps
+        watchWithClock clockPhases resF timeF duration combinedCrn
 
-    let watchConstRes clockPhases duration crn =
-        watch clockPhases Simulator.constRes Simulator.constResTime duration crn
+    let watchConstRes duration crnSteps =
+        watch Simulator.constRes Simulator.constResTime duration crnSteps
+
+    let filterClockSpecies data =
+        List.filter (fst >> Clock.isClockSpecies >> not) data

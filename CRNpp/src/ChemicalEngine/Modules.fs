@@ -93,7 +93,8 @@ module Modules =
 
     // todo why is it not oscillating???
     let clock phases =
-        let initClockSpecies i = if i = 1 || i = phases then ($"clc{i}", 1.0) else ($"clc{i}", 0.0)
+
+        let initClockSpecies i = (Clock.clockSpeciesName i, Clock.clockSpeciescConc phases i)
         let clcs = [1..phases] |> List.map initClockSpecies
 
         let clockReaction i =
