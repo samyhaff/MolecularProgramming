@@ -1,4 +1,4 @@
-open System
+﻿open System
 open Parser
 open TypeChecker
 
@@ -10,7 +10,13 @@ let main argv =
       1
    else
       let code = IO.File.ReadAllText(argv.[1])
+      test pcrn code
+
       let program = parse code
-      printfn "%A" program
-      printfn "%A" (checkProgram program)
+      let n = 10
+      let xs = [1..n] |> List.map float
+      BasicInterperter.run program 
+         |> BasicInterperter.envSeqToConc n
+         |> List.map (fun (n, ys) -> Rendering.Plotting.scatter xs ys n) 
+         |> Rendering.Plotting.show "GCD basic interpreter"
       0

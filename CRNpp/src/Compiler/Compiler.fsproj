@@ -8,12 +8,12 @@
     <Compile Include="Parser.fs" />
     <Compile Include="TypeChecker.fs" />
     <Compile Include="ModuleExamples.fs" />
+    <Compile Include="BasicInterpreter.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FParsec" Version="1.1.1" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ChemicalEngine\ChemicalEngine.fsproj" />
     <ProjectReference Include="..\Rendering\Rendering.fsproj" />
