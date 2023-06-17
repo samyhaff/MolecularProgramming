@@ -1,5 +1,6 @@
 ﻿open System
 open Parser
+open TypeChecker
 
 [<EntryPoint>]
 let main argv =

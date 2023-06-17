@@ -9,6 +9,7 @@
     <Compile Include="examples\Modules.fs" />
     <Compile Include="examples\Clocks.fs" />
     <Compile Include="examples\Formulas.fs" />
+    <Compile Include="TypeChecker.fs" />
     <Compile Include="BasicInterpreter.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
