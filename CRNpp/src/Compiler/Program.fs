@@ -19,14 +19,16 @@ let main argv =
       // Examples.Formulas.pi ()
       0
    else
+      // ChemicalEngine.Parser.test ChemicalEngine.Parser.preaction "A + A (0.5)-> C"
+
       let code = IO.File.ReadAllText(argv.[1])
       test pcrn code
 
       let program = parse code
       let n = 10
       let xs = [1..n] |> List.map float
-      BasicInterperter.run program 
+      BasicInterperter.run program
          |> BasicInterperter.envSeqToConc n
-         |> List.map (fun (n, ys) -> Rendering.Plotting.scatter xs ys n) 
+         |> List.map (fun (n, ys) -> Rendering.Plotting.scatter xs ys n)
          |> Rendering.Plotting.show "GCD basic interpreter"
       0
