@@ -13,7 +13,8 @@ let main argv =
       // Examples.Modules.cmp()
       // Examples.Clocks.fakeClock()
       // Examples.Modules.ifGt ()
-      Examples.Modules.clock 3
+      // Examples.Modules.clock 3
+      Examples.Reactions.exampleReaction
       // Examples.Formulas.factorial 5
       // Examples.Formulas.eulersConstant ()
       // Examples.Formulas.pi ()
