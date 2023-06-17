@@ -14,14 +14,12 @@ let main argv =
       // Examples.Clocks.fakeClock()
       // Examples.Modules.ifGt ()
       // Examples.Modules.clock 3
-      Examples.Reactions.exampleReaction
+      Examples.Reactions.exampleReaction "A -> A + C B -> B + C C -> 0"
       // Examples.Formulas.factorial 5
       // Examples.Formulas.eulersConstant ()
       // Examples.Formulas.pi ()
       0
    else
-      // ChemicalEngine.Parser.test ChemicalEngine.Parser.preaction "A + A (0.5)-> C"
-
       let code = IO.File.ReadAllText(argv.[1])
       test pcrn code
 

@@ -15,6 +15,6 @@ module Reactions =
                     |> Seq.takeWhile (fun i -> i < n)
                     |> Seq.toList
 
-    let exampleReaction =
-        let data = CRN.fromReactionAndSpecies [Parser.parse "A + B -> C"] [("A", 1.0); ("B", 1.0); ("C", 0.0)] |> Normal |> watchCmd
+    let exampleReaction reaction =
+        let data = CRN.fromReactionAndSpecies (Parser.parse reaction) [("A", 1.0); ("B", 1.0); ("C", 0.0)] |> Normal |> watchCmd
         data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "sub with A > B"
