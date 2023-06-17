@@ -9,13 +9,14 @@ let main argv =
       printfn "Usage: %s <filename>" programName
       printfn "Running checks..."
       // ChemicalEngine.Checks.runAll ()
+      // Examples.Modules.watchModule (fun () -> ChemicalEngine.Modules.sub ("A",131.218572) ("B",24.45533649) ("C",46.70537003)) "sub test"
       // Examples.Modules.cmp()
       // Examples.Clocks.fakeClock()
       // Examples.Modules.ifGt ()
-      // Examples.Modules.clock 3
+      Examples.Modules.clock 3
       // Examples.Formulas.factorial 5
       // Examples.Formulas.eulersConstant ()
-      Examples.Formulas.pi ()
+      // Examples.Formulas.pi ()
       0
    else
       let code = IO.File.ReadAllText(argv.[1])

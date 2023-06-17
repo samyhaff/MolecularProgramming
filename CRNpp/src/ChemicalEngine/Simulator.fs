@@ -13,7 +13,7 @@ module Simulator =
     let expRes n = 2.0 ** (-(float n)/8.0)
 
     let dS ((reactions,solution):CRN) (name:Name) (resolution: float)= 
-        let rateProduct solution (reactants:Reactants) = 
+        let concProduct solution (reactants:Reactants) = 
             reactants 
              |> Seq.map (fun (n, m) -> (Map.find n solution, m))
              |> Seq.fold (fun acc ((_,c), m) -> acc * pown c m) 1.0 
@@ -29,7 +29,7 @@ module Simulator =
             in (changeS products) - (changeS reactants)
 
         let summands (name:Name) (solution:Solution) ((reactants, rate, products):Reaction) = 
-            let summand = rate * (netChange name reactants products) * (rateProduct solution reactants)
+            let summand = rate * (netChange name reactants products) * (concProduct solution reactants)
             summand
 
         let result = reactions |> Seq.map (summands name solution) |> Seq.sum |> float  |> (fun x -> x * resolution)

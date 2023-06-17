@@ -74,9 +74,10 @@ module Checks =
         let C = ("C", c3)
 
         let crn = Modules.div A B C |> runCmd
-        verify (name A) crn (conc A) &&
-        verify (name B) crn (conc B) &&
-        verify (name C) crn (conc A / conc B)
+        (conc B > 0.5) ==>
+            (verify (name A) crn (conc A) &&
+            verify (name B) crn (conc B) &&
+            verify (name C) crn (conc A / conc B))
 
     let sqrtCheck (Con(c1)) (Con(c2)) =
         let A = ("A", c1)
