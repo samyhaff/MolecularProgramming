@@ -125,12 +125,10 @@ module Modules =
             |> Nested
 
 
-    // todo why is it not oscillating???
     let clock phases =
 
-        let initClockSpecies i = (Clock.clockSpeciesName i, Clock.clockSpeciescConc phases i)
         let phaseIndices = [0..phases-1]
-        let clcs = phaseIndices |> List.map initClockSpecies
+        let clcs = phaseIndices |> List.map (Clock.clockSpecies phases)
 
         let clockReaction i =
             let i1, i2 = (i) % phases, (i+1) % phases

@@ -78,7 +78,13 @@ module Modules =
         printfn "reactions: %A" (fst crn)
         printfn "solution: %A" (snd crn)
 
+        let duration = 120.0
+        let xs = Seq.initInfinite Simulator.constResTime
+                    |> Seq.takeWhile (fun i -> i <= duration)
+                    |> Seq.toList
+
         Simulator.watch resF (List.length xs) crn 
+            |> FakeClockSimulator.filterNames [Clock.clockSpeciesName 0]
             |> List.map (fun (n, ys) -> scatter xs ys n) 
             |> show "clock"
 
