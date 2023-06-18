@@ -14,11 +14,10 @@ let main argv =
       // Examples.Clocks.fakeClock()
       // Examples.Modules.ifGt ()
       // Examples.Modules.clock 3
-      Examples.Reactions.exampleReaction "A -> A + C B -> B + C C -> 0"
+      Examples.Reactions.exampleReaction @"A: 1.0, B: 1.0, C: 0.0; A -> A + C, B -> B + C, C -> 0"
       // Examples.Formulas.factorial 5
       // Examples.Formulas.eulersConstant ()
       // Examples.Formulas.pi ()
-      0
    else
       let code = IO.File.ReadAllText(argv.[1])
       test pcrn code
@@ -30,4 +29,4 @@ let main argv =
          |> BasicInterperter.envSeqToConc n
          |> List.map (fun (n, ys) -> Rendering.Plotting.scatter xs ys n)
          |> Rendering.Plotting.show "GCD basic interpreter"
-      0
+   0
