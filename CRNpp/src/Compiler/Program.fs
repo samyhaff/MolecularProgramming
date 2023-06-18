@@ -1,6 +1,7 @@
 ﻿open System
 open Parser
 open TypeChecker
+open Visualizer
 
 [<EntryPoint>]
 let main argv =
@@ -23,9 +24,9 @@ let main argv =
       // Examples.Formulas.pi ()
    else
       let code = IO.File.ReadAllText(argv.[1])
-      test pcrn code
-
+      // test pcrn code
       let program = parse code
+      printf "%A" (convert program)
       let n = 10
       let xs = [1..n] |> List.map float
       BasicInterperter.run program

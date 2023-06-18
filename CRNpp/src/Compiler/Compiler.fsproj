@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Ast.fs" />
+    <Compile Include="Visualizer.fs" />
     <Compile Include="Parser.fs" />
     <Compile Include="examples\Modules.fs" />
     <Compile Include="examples\Clocks.fs" />
