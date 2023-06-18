@@ -43,6 +43,13 @@ module Modules =
             abs (expected - simulated)
         )
 
+    let subAGtB () =
+        plotError "sub error on domain: A >= B" (fun a b ->
+            let simulated = if a >= b then Modules.sub (A a) (B b) C |> eval C else 0.0
+            let expected = if a > b then a - b else 0.0
+            abs (expected - simulated)
+        )
+
     let mul () =
         plotError "mul error" (fun a b ->
             let simulated = Modules.mul (A a) (B b) C |> eval C
