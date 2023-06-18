@@ -7,7 +7,21 @@ let main argv =
    let programName = AppDomain.CurrentDomain.FriendlyName
    if argv.Length = 0 then
       printfn "Usage: %s <filename>" programName
-      1
+      printfn "Running checks..."
+      ChemicalEngine.Checks.runAll ()
+      // Examples.Modules.watchModule (fun () -> ChemicalEngine.Modules.sub ("A",131.218572) ("B",24.45533649) ("C",46.70537003)) "sub test"
+      // Examples.Modules.add ()
+      // Examples.Modules.mul ()
+      // Examples.Modules.div ()
+      // Examples.Modules.clock 3
+      // Examples.Modules.cmp ()
+      // Examples.Modules.ifGt ()
+
+      // Examples.Clocks.fakeClock()
+      // Examples.Formulas.factorial 5
+      // Examples.Formulas.eulersConstant ()
+      // Examples.Formulas.pi ()
+      0
    else
       let code = IO.File.ReadAllText(argv.[1])
       test pcrn code

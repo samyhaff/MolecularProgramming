@@ -4,9 +4,13 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Clock.fs" />
     <Compile Include="Reaction.fs" />
-    <Compile Include="Simulator.fs" />
+    <Compile Include="CRN.fs" />
+    <Compile Include="Command.fs" />
     <Compile Include="Modules.fs" />
+    <Compile Include="Simulator.fs" />
+    <Compile Include="FakeClockSimulator.fs" />
     <Compile Include="Checks.fs" />
   </ItemGroup>
   <ItemGroup>

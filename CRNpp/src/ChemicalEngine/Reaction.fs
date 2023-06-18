@@ -1,3 +1,5 @@
+// Author: Roar Nind Steffensen, 13/06/2023
+
 namespace ChemicalEngine
 
 module Reaction =
@@ -6,17 +8,18 @@ module Reaction =
     type Multiplicity = int
     type Concentration = float
     type Rate = float
-    type Chemical = S of Name * Concentration * Multiplicity
-    type Reactants = Name list
-    type Products = Name list
+    type Species = Name * Concentration
+    type ReactionComponent = Name * Multiplicity
+    type Reactants = ReactionComponent list
+    type Products = ReactionComponent list
     type Reaction = Reactants * Rate * Products
-    type Solution = Map<Name, Chemical>
+    type Solution = Map<Name, Species>
     type CRN = Reaction list * Solution
 
-    let name (S(n,_,_)) = n
-    let conc (S(_,c,_)) = c
-    let mult (S(_,_,m)) = m
+    type Command = | Cmp of CRN | Normal of CRN | Nested of Command list
+    type Step = Command list
+    type Formula = Step list
 
-    let toCRN (reactions:Reaction list) (chemicals:Chemical list) :CRN =
-        let solution = List.zip (List.map name chemicals) chemicals |> Map.ofList
-        (reactions, solution)
+    let name (n,_) :Name= n
+    let conc ((_,c):Species) = c
+    let mult ((_,m):ReactionComponent) = m

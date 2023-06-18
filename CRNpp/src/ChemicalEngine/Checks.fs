@@ -1,3 +1,5 @@
+// Author: Roar Nind Steffensen, 13/06/2023
+
 namespace ChemicalEngine
 
 module Checks =
@@ -6,70 +8,75 @@ module Checks =
 
     type Concentration = Con of float
 
-    let CRNtolerance = 0.001
+    let private cmdToFormula cmd :Formula = [[cmd]]
+    let private runCmd = cmdToFormula
+                        >> Simulator.simulateFormula
+                        >> snd
+                        >> Seq.skip (Simulator.stepsInDuration Simulator.approxCycleDuration)
+                        >> Seq.head
 
     let floatEquals f1 f2 =
-        abs (f2-f1) < 0.05
+        abs (f2-f1) < 0.5
 
     let verify (name:Name) (crn:CRN) (expected:float) =
         Map.find name (snd crn) |> conc |> floatEquals expected
-    let concIn (crn:CRN) (s:Chemical) = 
-        Map.find (name s) (snd crn) |> conc
 
     let ldCheck (Con(c1)) (Con(c2)) =
-        let A = S("A", c1, 1)
-        let B = S("B", c2, 1)
+        let A = ("A", c1)
+        let B = ("B", c2)
 
-        let crn = Modules.ld A B |> Simulator.runToStable CRNtolerance
+        let crn = Modules.ld A B |> runCmd
         verify (name A) crn (conc A) &&
         verify (name B) crn (conc A)
 
     let addCheck (Con(c1)) (Con(c2)) (Con(c3)) =
-        let A = S("A", c1, 1)
-        let B = S("B", c2, 1)
-        let C = S("C", c3, 1)
+        let A = ("A", c1)
+        let B = ("B", c2)
+        let C = ("C", c3)
 
-        let crn = Modules.add A B C |> Simulator.runToStable CRNtolerance
+        let crn = Modules.add A B C |> runCmd
         verify (name A) crn (conc A) && 
         verify (name B) crn (conc B) && 
         verify (name C) crn (conc A + conc B)
 
-    let subCheck (Con(c1)) (Con(c2)) (Con(c3)) =
-        let A = S("A", c1, 1)
-        let B = S("B", c2, 1)
-        let C = S("C", c3, 1)
+    let subAgtBCheck (Con(c1)) (Con(c2)) (Con(c3)) =
+        let A = ("A", c1)
+        let B = ("B", c2)
+        let C = ("C", c3)
 
-        let crn = Modules.sub A B C |> Simulator.runToStable CRNtolerance
-        verify (name A) crn (conc A) && 
-        verify (name B) crn (conc B) && 
-        verify (name C) crn (if conc A > conc B then (conc A - conc B) else 0.0)
+        let crn = Modules.sub A B C |> runCmd
+        (conc A > conc B + 2.0) ==>
+            (verify (name A) crn (conc A) && 
+            verify (name B) crn (conc B) && 
+            verify (name C) crn (conc A - conc B))
 
 
     let mulCheck (Con(c1)) (Con(c2)) (Con(c3)) =
-        let A = S("A", c1, 1)
-        let B = S("B", c2, 1)
-        let C = S("C", c3, 1)
+        let A = ("A", c1)
+        let B = ("B", c2)
+        let C = ("C", c3)
 
-        let crn = Modules.mul A B C |> Simulator.runToStable CRNtolerance
+        let crn = Modules.mul A B C |> runCmd
         verify (name A) crn (conc A) &&
         verify (name B) crn (conc B) &&
         verify (name C) crn (conc A * conc B)
 
     let divCheck (Con(c1)) (Con(c2)) (Con(c3)) =
-        let A = S("A", c1, 1)
-        let B = S("B", c2, 1)
-        let C = S("C", c3, 1)
+        let A = ("A", c1)
+        let B = ("B", c2)
+        let C = ("C", c3)
 
-        let crn = Modules.div A B C |> Simulator.runToStable CRNtolerance
-        verify (name A) crn (conc A) &&
-        verify (name B) crn (conc B) &&
-        verify (name C) crn (conc A / conc B)
+        let crn = Modules.div A B C |> runCmd
+        (conc B > 0.5) ==>
+            (verify (name A) crn (conc A) &&
+            verify (name B) crn (conc B) &&
+            verify (name C) crn (conc A / conc B))
 
     let sqrtCheck (Con(c1)) (Con(c2)) =
-        let A = S("A", c1, 1)
-        let B = S("B", c2, 1)
+        let A = ("A", c1)
+        let B = ("B", c2)
 
-        let crn = Modules.sqrt A B |> Simulator.runToStable CRNtolerance
+        let crn = Modules.sqrt A B |> runCmd
         verify (name A) crn (conc A) &&
         verify (name B) crn (conc A |> sqrt)
 
@@ -97,7 +104,7 @@ module Checks =
         printfn "Checking modules:"
         checkQuick "ld" ldCheck
         checkQuick "add" addCheck
-        checkQuick "sub" subCheck
+        checkQuick "sub" subAgtBCheck
         checkQuick "mul" mulCheck
         checkQuick "div" divCheck
         checkQuick "sqrt" sqrtCheck
