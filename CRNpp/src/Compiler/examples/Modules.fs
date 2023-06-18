@@ -14,7 +14,7 @@ module Modules =
 
     let watchModule moduleF label =
         let (xs, data) = moduleF () |> watchCmdCycle
-        data |> List.map (fun (n, ys) -> scatter xs ys n) |> show label
+        data |> List.map (fun (n, ys) -> scatter xs ys n) |> showPlots label
 
     let subAgtB () = 
         let A = ("A", 10.0)
@@ -22,7 +22,7 @@ module Modules =
         let C = ("C", 0.0)
 
         let (xs, data) = Modules.sub A B C |> watchCmdCycle
-        data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "sub with A > B"
+        data |> List.map (fun (n, ys) -> scatter xs ys n) |> showPlots "sub with A > B"
 
     let subAltB () = 
         let A = ("A", 2.0)
@@ -30,7 +30,7 @@ module Modules =
         let C = ("C", 0.0)
 
         let (xs,data) = Modules.sub A B C |> watchCmdCycle
-        data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "sub with A < B"
+        data |> List.map (fun (n, ys) -> scatter xs ys n) |> showPlots "sub with A < B"
 
     let add () = 
         let A = ("A", 2.0)
@@ -38,7 +38,7 @@ module Modules =
         let C = ("C", 0.0)
 
         let (xs,data) = Modules.add A B C |> watchCmdCycle
-        data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "add"
+        data |> List.map (fun (n, ys) -> scatter xs ys n) |> showPlots "add"
 
     let mul () = 
         let A = ("A", 2.0)
@@ -46,7 +46,7 @@ module Modules =
         let C = ("C", 0.0)
 
         let (xs,data) = Modules.mul A B C |> watchCmdCycle
-        data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "mul"
+        data |> List.map (fun (n, ys) -> scatter xs ys n) |> showPlots "mul"
 
     let div () = 
         let A = ("A", 8.0)
@@ -54,7 +54,7 @@ module Modules =
         let C = ("C", 0.0)
 
         let (xs,data) = Modules.div A B C |> watchCmdCycle
-        data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "div"
+        data |> List.map (fun (n, ys) -> scatter xs ys n) |> showPlots "div"
 
 
     let sqrt () =
@@ -62,21 +62,21 @@ module Modules =
         let B = ("B", 0.0)
 
         let (xs,data) = Modules.sqrt A B |> watchCmdCycle
-        data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "sqrt"
+        data |> List.map (fun (n, ys) -> scatter xs ys n) |> showPlots "sqrt"
 
     let clock phases =
         let duration = 120.0
         let formula = [1..phases] |> List.map (fun _ -> []) // empty steps to just see clock phases
 
         let (xs,data) = Simulator.watch duration formula
-        data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "clock"
+        data |> List.map (fun (n, ys) -> scatter xs ys n) |> showPlots "clock"
 
     let cmp () =
         let A = ("A", 2.0)
         let B = ("B", 5.0)
 
         let (xs,data) = Modules.cmp A B |> watchCmd 90.0
-        data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "cmp"
+        data |> List.map (fun (n, ys) -> scatter xs ys n) |> showPlots "cmp"
 
     let ifGt () =
         let A = ("A", 5.0)
@@ -93,5 +93,5 @@ module Modules =
 
         let duration = 90.0
         let (xs, data) = Simulator.watch duration formula
-        data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "ifGt A > B -> C := A; A < B -> C := B"
+        data |> List.map (fun (n, ys) -> scatter xs ys n) |> showPlots "ifGt A > B -> C := A; A < B -> C := B"
 

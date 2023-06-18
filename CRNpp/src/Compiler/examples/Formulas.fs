@@ -10,7 +10,7 @@ module Formulas =
     let showCycles duration species title formula = 
         let filter = Simulator.onlyBySpecies species
         let (xs, data) = Simulator.watchFiltered duration filter formula
-        data |> List.map (fun (n, ys) -> scatter xs ys n) |> show title
+        data |> List.map (fun (n, ys) -> scatter xs ys n) |> showPlots title
         
     let factorial n = 
     

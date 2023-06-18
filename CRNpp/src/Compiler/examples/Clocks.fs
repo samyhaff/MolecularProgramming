@@ -20,4 +20,4 @@ module Clocks =
       let stepCount = List.length formula
       let duration = 2.0 * float Clock.stepPeriod * FakeClockSimulator.clockPhaseDuration * float stepCount
       let (xs, data) = formula |> FakeClockSimulator.watch duration 
-      data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "fake clock"
+      data |> List.map (fun (n, ys) -> scatter xs ys n) |> showPlots "fake clock"
