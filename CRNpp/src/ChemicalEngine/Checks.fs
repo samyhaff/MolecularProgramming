@@ -8,10 +8,8 @@ module Checks =
 
     type Concentration = Con of float
 
-    let private cmdToFormula cmd :Formula = [[cmd]]
-    let private runCmd = cmdToFormula
-                        >> Simulator.simulateFormula
-                        >> snd
+    let private runCmd = Command.toCRN
+                        >> Simulator.simulate
                         >> Seq.skip (Simulator.stepsInDuration Simulator.approxCycleDuration)
                         >> Seq.head
 
@@ -45,7 +43,7 @@ module Checks =
         let C = ("C", c3)
 
         let crn = Modules.sub A B C |> runCmd
-        (conc A > conc B + 2.0) ==>
+        (conc A > conc B + 1.0) ==>
             (verify (name A) crn (conc A) && 
             verify (name B) crn (conc B) && 
             verify (name C) crn (conc A - conc B))
@@ -93,7 +91,7 @@ module Checks =
                 override x.Generator = Arb.generate<NormalFloat>
                                         |> Gen.map NormalFloat.op_Explicit
                                         |> Gen.where ((<)0.0)
-                                        |> Gen.map Con
+                                        |> Gen.map (round >> Con)
             }
 
     let runAll () =

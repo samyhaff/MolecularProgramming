@@ -21,6 +21,12 @@ let main argv =
       // Examples.Formulas.factorial 5
       // Examples.Formulas.eulersConstant ()
       // Examples.Formulas.pi ()
+      // Errors.Modules.add ()
+      // Errors.Modules.sub ()
+      // Errors.Modules.subAGtB ()
+      // Errors.Modules.mul ()
+      // Errors.Modules.div ()
+      0
    else
       let code = IO.File.ReadAllText(argv.[1])
       test pcrn code
@@ -30,6 +36,6 @@ let main argv =
       let xs = [1..n] |> List.map float
       BasicInterperter.run program
          |> BasicInterperter.envSeqToConc n
-         |> List.map (fun (n, ys) -> Rendering.Plotting.scatter xs ys n)
-         |> Rendering.Plotting.show "GCD basic interpreter"
-   0
+         |> List.map (fun (n, ys) -> Rendering.Plotting.scatter xs ys n) 
+         |> Rendering.Plotting.showPlots "GCD basic interpreter"
+      0

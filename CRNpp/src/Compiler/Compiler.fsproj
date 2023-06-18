@@ -10,6 +10,7 @@
     <Compile Include="examples\Clocks.fs" />
     <Compile Include="examples\Formulas.fs" />
     <Compile Include="examples\Reactions.fs" />
+    <Compile Include="errors\ModuleErrors.fs" />
     <Compile Include="TypeChecker.fs" />
     <Compile Include="BasicInterpreter.fs" />
     <Compile Include="Program.fs" />

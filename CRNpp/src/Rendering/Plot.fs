@@ -4,13 +4,29 @@ namespace Rendering
 
 module Plotting =
     open Plotly.NET
+    open Plotly.NET.TraceObjects
+    open Plotly.NET.LayoutObjects
+    open Plotly.NET.StyleParam
     type Plot = P of GenericChart.GenericChart
 
-    let scatter (xs:'a list) (ys:'a list) label= 
-        Chart.Scatter(X=xs, Y=ys, Mode=StyleParam.Mode.Lines_Markers, Name=label)
+    let scatter x y label= 
+        Chart.Scatter(X=x, Y=y, Mode=Mode.Lines_Markers, Name=label)
         |> P
 
-    let show title ps = 
+    let surface x y z xLabel yLabel zLabel =
+        let axis title = LinearAxis.init (Title=Title.init title)
+
+        Chart.Surface (X=x, Y=y, zData=z, Contours=Contours.initXyz(Show=true), ShowScale=false)
+        |> Chart.withSceneStyle (XAxis=axis xLabel, YAxis=axis yLabel, ZAxis=axis zLabel, 
+                                AspectRatio=AspectRatio.init(1.0, 1.0, 0.5), AspectMode=AspectMode.Manual)
+        |> P
+
+    let showPlot title (P(chart)) =
+        chart
+        |> Chart.withTitle(Title.init(title))
+        |> Chart.show
+
+    let showPlots title ps = 
         ps 
         |> Seq.map (fun (P(chart)) -> chart)
         |> Chart.combine
