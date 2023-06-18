@@ -37,17 +37,17 @@ module Simulator =
             |> Seq.sum 
             |> scaleByResolution
 
-    let private updateSpecies (crn:CRN) ((name, conc):Species) =
+    let updateSpecies (crn:CRN) ((name, conc):Species) =
         (name, conc + dS crn name)
 
     let private update (crn:CRN) =
         let updatedSolution = Map.map (fun _ species -> updateSpecies crn species) (snd crn)
         in (fst crn, updatedSolution)
 
-    let private simulate (crn:CRN) :CRN seq = 
-        let rec simulate' (crn:CRN) =
-            seq {yield crn; yield! simulate' (update crn)}
-        in simulate' crn
+    let simulate crnUpdater (crn:CRN) :CRN seq = 
+        let rec simulate' (crn:CRN) n =
+            seq {yield crn; yield! simulate' (crnUpdater (timeAtIteration n) crn) (n+1)}
+        in simulate' crn 1
     
     let private mapNameToReactionComponent multiplicity name :ReactionComponent =
         (name, multiplicity)
@@ -114,12 +114,15 @@ module Simulator =
     let private ofFormula (formula:Formula) :CRN =
         formula |> bindCmpPhases |> bindClock
 
-    let simulateFormula (formula:Formula) =
+    let simulateFormula' crnUpdater (formula:Formula) =
         let crn = ofFormula formula
         let names = snd crn |> Map.keys |> Set.ofSeq
-        names, simulate crn
+        names, simulate crnUpdater crn
 
-    let private extractConcentrations (names:Name Set) (duration:float) (crn:CRN seq) =
+    let simulateFormula (formula:Formula) =
+        simulateFormula' (fun _ -> update) formula
+
+    let extractConcentrations (names:Name Set) (duration:float) (crn:CRN seq) =
         let (slns, xs) = Seq.initInfinite timeAtIteration 
                             |> Seq.zip crn 
                             |> Seq.takeWhile (fun (c,t) -> t < duration) 
