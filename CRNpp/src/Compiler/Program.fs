@@ -27,6 +27,7 @@ let main argv =
       // test pcrn code
       let program = parse code
       printf "%A" (convert program)
+      drawAst program
       let n = 10
       let xs = [1..n] |> List.map float
       BasicInterperter.run program

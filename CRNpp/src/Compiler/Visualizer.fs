@@ -1,13 +1,13 @@
 module Visualizer
 
 open Ast
-
-type 'a Tree = Node of 'a * 'a Tree list
+open TreeDesigner
+open TreeRenderer
 
 let rec convert (ast: Crn) : Tree<string> =
    let rec rootConvert roots =
       match roots with
-      | [] -> [Node("", [])]
+      | [] -> []
       | Conc(s, c)::rest -> Node($"Conc({s}, {c})", [])::(rootConvert rest)
       | Step(commands)::rest ->
          let rec commandConvert commands =
@@ -27,3 +27,7 @@ let rec convert (ast: Crn) : Tree<string> =
             | Ifeq(commands)::rest -> Node($"Ifeq", commandConvert commands)::(commandConvert rest)
          Node("Step", commandConvert commands)::(rootConvert rest)
    in Node("Crn", rootConvert ast)
+
+let drawAst (ast: Crn) =
+   let designConfig, renderConfig = Config.getConfig()
+   ast |> convert |> design designConfig |> render renderConfig

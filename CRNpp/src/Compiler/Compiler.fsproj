@@ -21,5 +21,6 @@
   <ItemGroup>
     <ProjectReference Include="..\ChemicalEngine\ChemicalEngine.fsproj" />
     <ProjectReference Include="..\Rendering\Rendering.fsproj" />
+    <ProjectReference Include="..\DrawingTrees\DrawingTrees.fsproj" />
   </ItemGroup>
 </Project>
