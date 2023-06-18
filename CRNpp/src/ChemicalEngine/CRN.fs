@@ -2,8 +2,7 @@
 
 namespace ChemicalEngine
 
-
-module CRN = 
+module CRN =
     open Reaction
     let fromReactionAndSpecies (reactions:Reaction list) (chemicals:Species list) :CRN =
         let solution = List.map (fun c -> name c, c) chemicals |> Map.ofList
