@@ -3,7 +3,6 @@
 namespace ChemicalEngine
 
 module Reaction =
-
     type Name = string
     type Multiplicity = int
     type Concentration = float
