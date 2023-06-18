@@ -12,7 +12,7 @@ let getPositions trees =
 
 let parseLabel config lbl =
     let maxLines = config.MaxLinesLabel
-    let maxLineLength = 10
+    let maxLineLength = 30
 
     let takeMax limit list =
         List.take (min limit (List.length list)) list
