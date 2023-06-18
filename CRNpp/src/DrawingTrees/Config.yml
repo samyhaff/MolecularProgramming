@@ -1,0 +1,12 @@
+Designer:
+  HorizontalSpacing: 1.0 # Minimum spacing between nodes on a same level
+Renderer:
+  Mode: Angled # Drqwing mode (Angled / Direct)
+  VerticalSpacing: 1.0 # Vertical spacing between nodes
+  MaxLinesLabel: 1 # Maximum number of lines for labels
+  Margin: 20.0 # Specifies drawing margin as a percentage of the horizontal and vertical ranges
+  Width: 800 # Drawing window width
+  Height: 800 # Drawing window height
+  Colors: # colors are defined in the Color.fs file
+    Background: "White"
+    Line: "Black"

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Color.fs" />
+    <Compile Include="Config.fs" />
+    <Compile Include="StringF.fs" />
+    <Compile Include="TreeDesigner.fs" />
+    <Compile Include="TreeDesignerChecks.fs" />
+    <Compile Include="Renderer.fs" />
+    <Compile Include="TreeRenderer.fs" />
+    <Compile Include="TreeRendererChecks.fs" />
+    <Compile Include="TreeExamples.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FsCheck" Version="2.16.5" />
+    <PackageReference Include="FSharp.Configuration" Version="2.0.0" />
+    <PackageReference Include="Plotly.Net" Version="4.0.0" />
+  </ItemGroup>
+</Project>
