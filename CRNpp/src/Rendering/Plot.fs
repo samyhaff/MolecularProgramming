@@ -14,23 +14,10 @@ module Plotting =
         |> P
 
     let surface x y z xLabel yLabel zLabel =
-        let axis title scaleRatio scaleAnchor id = LinearAxis.init (
-                Title=Title.init title, 
-                ScaleRatio=scaleRatio, 
-                ScaleAnchor=scaleAnchor,
-                Overlaying = id
-            )
-
-        let free = LinearAxisId.Free
-        let xId = LinearAxisId.X 0
-        let yId = LinearAxisId.Y 0
-
-        let xAxis = axis xLabel 1.0 free xId
-        let yAxis = axis yLabel 1.0 free yId
-        let zAxis = axis zLabel 0.5 xId free
+        let axis title = LinearAxis.init (Title=Title.init title)
 
         Chart.Surface (X=x, Y=y, zData=z, Contours=Contours.initXyz(Show=true), ShowScale=false)
-        |> Chart.withSceneStyle (XAxis=xAxis, YAxis=yAxis, ZAxis=zAxis, 
+        |> Chart.withSceneStyle (XAxis=axis xLabel, YAxis=axis yLabel, ZAxis=axis zLabel, 
                                 AspectRatio=AspectRatio.init(1.0, 1.0, 0.5), AspectMode=AspectMode.Manual)
         |> P
 
