@@ -73,7 +73,7 @@ module Simulator =
 
         in bindCmpPhase2 formula
 
-    let private bindSpecies ((nameS, concS):Species) (crn:CRN) :CRN =
+    let private catalyseWith ((nameS, concS):Species) (crn:CRN) :CRN =
         let reactions = fst crn |> List.map (fun (reactants, rate, products) -> 
             let comp = mapNameToReactionComponent 1 nameS
             in (comp :: reactants), rate, comp :: products)
@@ -81,7 +81,7 @@ module Simulator =
         let solution = snd crn |> Map.add nameS (nameS, concS)
         (reactions, solution)
 
-    let private addSpecies (crn:CRN) species :CRN =
+    let private addToSolution (crn:CRN) species :CRN =
         let solution = List.fold (fun m (n,c) -> Map.add n (n,c) m) (snd crn) species
         in (fst crn, solution)
 
@@ -95,7 +95,7 @@ module Simulator =
             step 
                 |> List.map Command.toCRN 
                 |> CRN.collect 
-                |> bindSpecies species
+                |> catalyseWith species
 
         let bindOffPeriodSpecies crn =
             Seq.initInfinite id
@@ -103,7 +103,7 @@ module Simulator =
                 |> Seq.filter (fun i -> not <| Map.containsKey (Clock.clockSpeciesName i) (snd crn))
                 |> Seq.map (Clock.clockSpecies clockPhases)
                 |> Seq.toList
-                |> addSpecies crn
+                |> addToSolution crn
 
         formula 
             |> List.mapi bindClockStep
