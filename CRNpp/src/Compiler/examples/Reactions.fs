@@ -12,4 +12,4 @@ module Reactions =
     let exampleReaction input =
         let species, reactions = Parser.parse input
         let (xs, data) = CRN.fromReactionAndSpecies reactions species |> Normal |> watchCmdCycle
-        data |> List.map (fun (n, ys) -> scatter xs ys n) |> show "Example Reaction"
+        data |> List.map (fun (n, ys) -> scatter xs ys n) |> showPlots "Example Reaction"

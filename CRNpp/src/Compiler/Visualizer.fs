@@ -30,4 +30,4 @@ let rec convert (ast: Crn) : Tree<string> =
 
 let drawAst (ast: Crn) =
    let designConfig, renderConfig = Config.getConfig()
-   ast |> convert |> design designConfig |> render renderConfig
+   ast |> convert |> design designConfig |> render {renderConfig with Width=1200}
