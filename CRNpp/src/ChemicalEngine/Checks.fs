@@ -8,10 +8,8 @@ module Checks =
 
     type Concentration = Con of float
 
-    let private cmdToFormula cmd :Formula = [[cmd]]
-    let private runCmd = cmdToFormula
-                        >> Simulator.simulateFormula
-                        >> snd
+    let private runCmd = Command.toCRN
+                        >> Simulator.simulate
                         >> Seq.skip (Simulator.stepsInDuration Simulator.approxCycleDuration)
                         >> Seq.head
 
