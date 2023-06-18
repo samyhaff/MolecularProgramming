@@ -8,18 +8,11 @@ module Checks =
 
     type Concentration = Con of float
 
-    let private CRNtolerance = 0.0001
-    let private CRNresolution = 0.01
-
-    let private resF = Simulator.constRes
-
-    // let run = Simulator.runToStable CRNresolution CRNtolerance
-    // let run crn = Simulator.simulate resF crn |> Seq.skip 2000 |> Seq.head
     let private cmdToFormula cmd :Formula = [[cmd]]
     let private runCmd = cmdToFormula
-                        >> FakeClockSimulator.simulateFormulaConstRes
+                        >> Simulator.simulateFormula
                         >> snd
-                        >> Seq.skip (Simulator.stepsInDuration FakeClockSimulator.clockPhaseDuration)
+                        >> Seq.skip (Simulator.stepsInDuration Simulator.approxCycleDuration)
                         >> Seq.head
 
     let floatEquals f1 f2 =

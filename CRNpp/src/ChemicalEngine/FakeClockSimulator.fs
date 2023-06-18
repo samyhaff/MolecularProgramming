@@ -11,25 +11,26 @@ module FakeClockSimulator =
         let conc' = if name = $"clc{currentPhase}" then 2.0 else 0.0
         conc'
 
-    let private update (clockPhases:int) (crn:CRN) res time =
+    let private update (clockPhases:int) (crn:CRN) time =
         let updateChemical ((name, conc):Species) =
             let updatedConcentration = 
                 if (name.StartsWith "clc") 
                 then updateClockSpecies clockPhases time name
-                else max 0.0 (conc + Simulator.dS crn name res)
+                else max 0.0 (conc + Simulator.dS crn name)
             (name, updatedConcentration)
 
         let updatedSolution = Map.map (fun _ chemical -> updateChemical chemical) (snd crn)
         in (fst crn, updatedSolution)
         
-    let private simulate clockPhases resF timeF (crn:CRN) :CRN seq = 
+    let private simulate clockPhases (crn:CRN) :CRN seq = 
         let rec simulate' (crn:CRN) n =
-            let next = update clockPhases crn (resF n) (timeF n)
+            let time = Simulator.timeAtIteration n
+            let next = update clockPhases crn time
             seq {yield crn; yield! simulate' next (n+1)}
         in simulate' crn 1
 
-    let private extractConcentrations (names:Name Set) timeF (duration:float) (crn:CRN seq) =
-        let slns = Seq.initInfinite timeF 
+    let private extractConcentrations (names:Name Set) (duration:float) (crn:CRN seq) =
+        let slns = Seq.initInfinite Simulator.timeAtIteration 
                     |> Seq.zip crn 
                     |> Seq.takeWhile (fun (c,t) -> t < duration) 
                     |> Seq.map (fun ((_,s),_) -> s)
@@ -88,21 +89,15 @@ module FakeClockSimulator =
         List.mapi (appendClockSpecies clockPhases) formula  |> CRN.collect |> addOffPeriodClockSpecies clockPhases
 
 
-    let simulateFormula resF timeF (formula:Formula) =
+    let simulateFormula (formula:Formula) =
         let clockPhases = Clock.stepPeriod * (List.length formula)
         let crn = ofFormula clockPhases formula
         let names = snd crn |> Map.keys |> Set.ofSeq
-        names, simulate clockPhases resF timeF crn
+        names, simulate clockPhases crn
 
-    let simulateFormulaConstRes formula =
-        simulateFormula Simulator.constRes Simulator.constResTime formula
-
-    let watch resF timeF duration (formula:Formula) = 
-        let (names, crns) = simulateFormula resF timeF formula
-        extractConcentrations names timeF duration crns
-
-    let watchConstRes duration formula =
-        watch Simulator.constRes Simulator.constResTime duration formula
+    let watch duration (formula:Formula) = 
+        let (names, crns) = simulateFormula formula
+        extractConcentrations names duration crns
 
     let filterClockSpecies data =
         List.filter (fst >> Clock.isClockSpecies >> not) data

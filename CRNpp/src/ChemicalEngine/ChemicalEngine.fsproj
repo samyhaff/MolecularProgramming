@@ -8,8 +8,8 @@
     <Compile Include="Reaction.fs" />
     <Compile Include="CRN.fs" />
     <Compile Include="Command.fs" />
-    <Compile Include="Simulator.fs" />
     <Compile Include="Modules.fs" />
+    <Compile Include="Simulator.fs" />
     <Compile Include="FakeClockSimulator.fs" />
     <Compile Include="Checks.fs" />
   </ItemGroup>

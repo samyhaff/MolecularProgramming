@@ -7,17 +7,10 @@ module Formulas =
     open ChemicalEngine.Modules
     open Rendering.Plotting
 
-    
-    let showCycles cycles species title formula = 
-        let duration = FakeClockSimulator.clockPhaseDuration * Clock.stepPeriodF * float (cycles * List.length formula)
-        let xs = Seq.initInfinite Simulator.constResTime
-                    |> Seq.takeWhile (fun i -> i < duration)
-                    |> Seq.toList
-
-        let data = FakeClockSimulator.watchConstRes duration formula 
-                    |> FakeClockSimulator.filterSpecies species
+    let showCycles duration species title formula = 
+        let filter = Simulator.onlyBySpecies species
+        let (xs, data) = Simulator.watchFiltered duration filter formula
         data |> List.map (fun (n, ys) -> scatter xs ys n) |> show title
-
         
     let factorial n = 
     
@@ -41,7 +34,7 @@ module Formulas =
             ]
         ]
 
-        showCycles n [fS] $"factorial: {n}!" formula
+        showCycles 500.0 [fS] $"factorial: {n}!" formula
 
     let eulersConstant () =
         let eS = ("e", 1.0)
@@ -67,7 +60,7 @@ module Formulas =
             ]
         ]
 
-        showCycles 5 [eS] "eulers constant 2.718..." formula
+        showCycles 500.0 [eS] "eulers constant 2.718..." formula
 
 
     let pi () = 
@@ -98,4 +91,4 @@ module Formulas =
                 ld piNextS piS
             ]
         ]
-        showCycles 5 [piS] "pi 3.1415..." formula
+        showCycles 500.0 [piS] "pi 3.1415..." formula
