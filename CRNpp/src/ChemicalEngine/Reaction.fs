@@ -15,7 +15,7 @@ module Reaction =
     type Solution = Map<Name, Species>
     type CRN = Reaction list * Solution
 
-    type Command = | Cmp of CRN | Normal of CRN | Nested of Command list
+    type Command = | Cmp of Command list | Normal of CRN | Nested of Command list
     type Step = Command list
     type Formula = Step list
 

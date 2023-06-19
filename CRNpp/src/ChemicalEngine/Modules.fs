@@ -71,38 +71,72 @@ module Modules =
 
         fromReactionAndSpecies reactions [A;B] |> Normal
 
-    let cmpGtName = "cmpGt"
-    let cmpLtName = "cmpLt"
-    let cmpTmpName = "cmpTmp"
+    let cmpE = ("cmpE", 0.5)
+    let cmpX = ("cmpX", 0.0)
+    let cmpXE = ("cmpXE", 0.0)
+    let cmpY = ("cmpY", 0.0)
+    let cmpYE = ("cmpYE", 0.0)
+    let cmpXEgtY = ("cmpXEgtY", 0.5)
+    let cmpXEltY = ("cmpXEltY", 0.5)
+    let cmpYEgtX = ("cmpYEgtX", 0.5)
+    let cmpYEltX = ("cmpYEltX", 0.5)
+    let cmpB1 = ("cmpB1", 0.0)
+    let cmpB2 = ("cmpB2", 0.0)
 
-    let cmp X Y =
+    let private cmpMapping X Y gt lt =
         let rate = 1.0
 
-        let gt = (cmpGtName, 0.5)
-        let lt = (cmpLtName, 0.5)
         let reactions = mapReactions [
             ([gt; Y], rate, [lt; Y]);
             ([lt; X], rate, [gt; X]);
         ]
-        fromReactionAndSpecies reactions [X;Y;gt;lt] |> Cmp
+        fromReactionAndSpecies reactions [X;Y;gt;lt] |> Normal
 
-    let cmpPhase2ReactionTemplate () =
-        let gt = cmpGtName
-        let lt = cmpLtName
-        let B = cmpTmpName
+    let private cmpApproximateMajority gt lt B =
         let rate = 1.0
-        let reactions = [
+        let reactions = mapReactions [
             ([gt; lt], rate, [lt; B ]);
             ([B ; lt], rate, [lt; lt]);
             ([lt; gt], rate, [gt; B ]);
             ([B ; gt], rate, [gt; gt]);
         ]
 
-        (reactions, [(B, 0.0)])
+        fromReactionAndSpecies reactions [gt;lt;B] |> Normal
 
-    let private addCatalysts (catalysts:Name list) (reactions:Reaction list) =
+
+    // cmp phases:
+    // 1:   x -> cmpX   | ld x cmpX
+    //    x+e -> cmpXe  | add x e cmpXe
+    //      y -> cmpY   | ld y cmpY
+    //    y+e -> cmpYe  | add y e cmpYe
+    // 2: cmpMapping cmpXE cmpY cmpXEgtY cmpXEltY  || cmpMapping cmpYE cmpX cmpYEgtX cmpYEltX 
+    // 3: cmpAM XEgtY XEltY B1 || cmpAM YEgtX YEltX
+
+    let cmp A B =
+        [
+            ld A cmpX;
+            add A cmpE cmpXE;
+            ld B cmpY;
+            add B cmpE cmpYE;
+        ] |> Cmp
+
+    let cmpStep2 () :Step = 
+        [
+            // cmpMapping cmpX cmpY cmpXEgtY cmpXEltY;
+            cmpMapping cmpXE cmpY cmpXEgtY cmpXEltY;
+            cmpMapping cmpYE cmpX cmpYEgtX cmpYEltX;
+        ]
+    let cmpStep3 () :Step =
+        [
+            cmpApproximateMajority cmpXEgtY cmpXEltY cmpB1;
+            cmpApproximateMajority cmpYEgtX cmpYEltX cmpB2;
+        ]
+
+
+
+    let private addCatalysts (catalysts:Species list) (reactions:Reaction list) =
         let addCatalystsToComponents components =
-            List.map (fun n -> (n, 1)) catalysts @ components
+            List.map (fun (n,_) -> (n, 1)) catalysts @ components
         in List.map (fun (reactants, rate, products) -> 
                 addCatalystsToComponents reactants, rate, addCatalystsToComponents products) reactions
 
@@ -110,17 +144,32 @@ module Modules =
         let rec applyCatalystsToCmd cmd :Command= 
             match cmd with
             | Normal (r,s) -> Normal (addCatalysts catalysts r, s)
-            | Cmp (r,s) -> Normal (addCatalysts catalysts r, s)
+            | Cmp cmds -> Nested (List.map applyCatalystsToCmd cmds)
             | Nested cmds -> Nested (List.map applyCatalystsToCmd cmds)
         in List.map applyCatalystsToCmd commands
 
     let ifGt (commands:Command list) =
-        let catalysts = [cmpGtName]
+        let catalysts = [cmpXEgtY; cmpYEltX]
         in applyCatalystsToCmds catalysts commands
             |> Nested
 
     let ifLt (commands:Command list) =
-        let catalysts = [cmpLtName]
+        let catalysts = [cmpXEltY; cmpYEgtX]
+        in applyCatalystsToCmds catalysts commands
+            |> Nested
+
+    let ifEq (commands:Command list) =
+        let catalysts = [cmpXEgtY; cmpYEgtX]
+        in applyCatalystsToCmds catalysts commands
+            |> Nested
+
+    let ifGe (commands:Command list) =
+        let catalysts = [cmpXEgtY]
+        in applyCatalystsToCmds catalysts commands
+            |> Nested
+
+    let ifLe (commands:Command list) =
+        let catalysts = [cmpYEgtX]
         in applyCatalystsToCmds catalysts commands
             |> Nested
 
