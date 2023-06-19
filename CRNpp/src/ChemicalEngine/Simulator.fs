@@ -73,20 +73,20 @@ module Simulator =
         let updateTemplates = List.map (getUpdateTemplate (fst crn)) names
         
         let calculateConcProductFromTemplate (cs:Concentration list) (kc, productTemplate) =
-            List.fold (fun acc (i,m) -> acc * pown cs[i] m) (kc*resolution) productTemplate
+            Seq.fold (fun acc (i,m) -> acc * pown cs[i] m) (kc*resolution) productTemplate
 
         let updatedConcentration cs (template, currentConcentration) =
-            List.map (calculateConcProductFromTemplate cs) template
-                |> List.sum
+            Seq.map (calculateConcProductFromTemplate cs) template
+                |> Seq.sum
                 |> ((+) currentConcentration)
 
         let update cs = 
-            List.zip updateTemplates cs |> List.map (updatedConcentration cs)
+            Seq.zip updateTemplates cs |> Seq.map (updatedConcentration cs) |> Seq.toList
 
         let mapToCRN (names:Name list) (concentrations:Concentration list) :CRN =
-            let solution = List.zip names concentrations 
-                            |> List.map (fun (n,c) -> (n,(n,c))) 
-                            |> Map.ofList
+            let solution = Seq.zip names concentrations 
+                            |> Seq.map (fun (n,c) -> (n,(n,c))) 
+                            |> Map.ofSeq
             in (fst crn, solution)
 
         let rec simulate' cs :Concentration list seq =
