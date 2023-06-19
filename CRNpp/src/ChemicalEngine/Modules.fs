@@ -103,15 +103,6 @@ module Modules =
 
         fromReactionAndSpecies reactions [gt;lt;B] |> Normal
 
-
-    // cmp phases:
-    // 1:   x -> cmpX   | ld x cmpX
-    //    x+e -> cmpXe  | add x e cmpXe
-    //      y -> cmpY   | ld y cmpY
-    //    y+e -> cmpYe  | add y e cmpYe
-    // 2: cmpMapping cmpXE cmpY cmpXEgtY cmpXEltY  || cmpMapping cmpYE cmpX cmpYEgtX cmpYEltX 
-    // 3: cmpAM XEgtY XEltY B1 || cmpAM YEgtX YEltX
-
     let cmp A B =
         [
             ld A cmpX;
@@ -122,7 +113,6 @@ module Modules =
 
     let cmpStep2 () :Step = 
         [
-            // cmpMapping cmpX cmpY cmpXEgtY cmpXEltY;
             cmpMapping cmpXE cmpY cmpXEgtY cmpXEltY;
             cmpMapping cmpYE cmpX cmpYEgtX cmpYEltX;
         ]
@@ -131,8 +121,6 @@ module Modules =
             cmpApproximateMajority cmpXEgtY cmpXEltY cmpB1;
             cmpApproximateMajority cmpYEgtX cmpYEltX cmpB2;
         ]
-
-
 
     let private addCatalysts (catalysts:Species list) (reactions:Reaction list) =
         let addCatalystsToComponents components =
