@@ -11,5 +11,5 @@ module Command =
 
     let rec toCRN = function
         | Normal (crn) -> crn
-        | Cmp (crn) -> crn
+        | Cmp (cmds) -> List.map toCRN cmds |> CRN.collect
         | Nested cmds -> List.map toCRN cmds |> CRN.collect

@@ -34,7 +34,7 @@ module Formulas =
             ]
         ]
 
-        showCycles 500.0 [fS] $"factorial: {n}!" formula
+        showCycles 800.0 [fS] $"factorial: {n}!" formula
 
     let eulersConstant () =
         let eS = ("e", 1.0)

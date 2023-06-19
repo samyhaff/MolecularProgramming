@@ -43,7 +43,9 @@ module Simulator =
     let private update (crn:CRN) =
         let updatedSolution = Map.map (fun _ species -> updateSpecies crn species) (snd crn)
         in (fst crn, updatedSolution)
-    let crnUpdater = (fun _ -> update)
+    let crnUpdater time crn = 
+        // if time = ceil time then printfn $"simulating time {time}" else ()
+        update crn
 
     let simulate' crnUpdater (crn:CRN) :CRN seq = 
         let rec simulate' (crn:CRN) n =
@@ -62,18 +64,17 @@ module Simulator =
         in (mapping reactantNames, rate, mapping productNames)
 
     let private bindCmpPhases (formula:Formula) :Formula=
-        let cmpPhase2Step :Step = 
-            let (reactions, species) = Modules.cmpPhase2ReactionTemplate()
-            let reactions' = List.map (mapNamedReaction 1) reactions
-            [Normal <| CRN.fromReactionAndSpecies reactions' species]
-
-        let rec bindCmpPhase2 = 
+        let rec insertCmpPhases = 
             function
             | [] -> []
-            | step::rest when List.exists Command.containsCmp step -> step :: cmpPhase2Step :: bindCmpPhase2 rest
-            | step::rest -> step :: bindCmpPhase2 rest
+            | step::rest when List.exists Command.containsCmp step -> 
+                        let step2 = Modules.cmpStep2()
+                        let step3 = Modules.cmpStep3()
+                        step::step2::step3::insertCmpPhases rest
+            | step::rest -> step :: insertCmpPhases rest
 
-        in bindCmpPhase2 formula
+        let compilation = insertCmpPhases formula
+        compilation
 
     let private catalyseWith ((nameS, concS):Species) (crn:CRN) :CRN =
         let reactions = fst crn |> List.map (fun (reactants, rate, products) -> 
