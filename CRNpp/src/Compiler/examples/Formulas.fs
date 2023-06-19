@@ -7,10 +7,14 @@ module Formulas =
     open ChemicalEngine.Modules
     open Rendering.Plotting
 
-    let showCycles duration species title formula = 
+    let private showScatter title (xs,data)= 
+        data |> List.map (fun (n, ys) -> scatter xs ys n) |> showLabelledPlots title "time" "concentrations" (600,800)
+    let showCyclesFiltered duration filter title formula =
+        Simulator.watchFiltered duration filter formula |> showScatter title
+    let showCyclesOnlySpecies duration species title formula = 
         let filter = Simulator.onlyBySpecies species
-        let (xs, data) = Simulator.watchFiltered duration filter formula
-        data |> List.map (fun (n, ys) -> scatter xs ys n) |> showPlots title
+        showCyclesFiltered duration id title formula
+        showCyclesFiltered duration filter title formula
         
     let factorial n = 
     
@@ -34,7 +38,7 @@ module Formulas =
             ]
         ]
 
-        showCycles 500.0 [fS] $"factorial: {n}!" formula
+        showCyclesOnlySpecies 500.0 [fS] $"factorial: {n}!" formula
 
     let eulersConstant () =
         let eS = ("e", 1.0)
@@ -60,7 +64,7 @@ module Formulas =
             ]
         ]
 
-        showCycles 500.0 [eS] "eulers constant 2.718..." formula
+        showCyclesOnlySpecies 500.0 [eS] "eulers constant 2.718..." formula
 
 
     let pi () = 
@@ -91,4 +95,4 @@ module Formulas =
                 ld piNextS piS
             ]
         ]
-        showCycles 500.0 [piS] "pi 3.1415..." formula
+        showCyclesOnlySpecies 500.0 [piS] "pi 3.1415..." formula
