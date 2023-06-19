@@ -53,6 +53,49 @@ module Simulator =
         in simulate' crn 1
     let simulate = simulate' crnUpdater
     
+    let simulateFast (crn:CRN) :CRN seq =
+        let names = (snd crn) |> Map.keys |> Seq.toList
+        let nameIndexLookup = List.mapi (fun i n -> (n,i)) names |> Map.ofList
+        let concentrations = List.map (fun s -> conc <| Map.find s (snd crn)) names
+
+        let getUpdateTemplate reactions s =
+            let reactionTemplate s (reactants, rate, products) = 
+                let netChange name reactants products = 
+                    let change name cs = 
+                        Seq.filter (fun (n,_) -> n = name) cs
+                        |> Seq.map mult |> Seq.sum |> float
+                    let changeS = change name
+                    in (changeS products) - (changeS reactants)
+
+                let kc = rate * netChange s reactants products
+                let productTemplate = reactants |> List.map (fun (n, m) -> (Map.find n nameIndexLookup, m))
+                (kc, productTemplate)
+            in List.map (reactionTemplate s) reactions |> List.filter (fun (kc,_) -> kc <> 0.0)
+
+        let updateTemplates = List.map (getUpdateTemplate (fst crn)) names
+        
+        let calculateConcProductFromTemplate (cs:Concentration list) (kc, productTemplate) =
+            Seq.fold (fun acc (i,m) -> acc * pown cs[i] m) (kc*resolution) productTemplate
+
+        let updatedConcentration cs (template, currentConcentration) =
+            Seq.map (calculateConcProductFromTemplate cs) template
+                |> Seq.sum
+                |> ((+) currentConcentration)
+
+        let update cs = 
+            Seq.zip updateTemplates cs |> Seq.map (updatedConcentration cs) |> Seq.toList
+
+        let mapToCRN (names:Name list) (concentrations:Concentration list) :CRN =
+            let solution = Seq.zip names concentrations 
+                            |> Seq.map (fun (n,c) -> (n,(n,c))) 
+                            |> Map.ofSeq
+            in (fst crn, solution)
+
+        let rec simulate' cs :Concentration list seq =
+            seq {yield cs; yield! simulate' (update cs)}
+        in simulate' concentrations |> Seq.map (mapToCRN names)
+
+    
     let private mapNameToReactionComponent multiplicity name :ReactionComponent =
         (name, multiplicity)
 
@@ -89,7 +132,7 @@ module Simulator =
         in (fst crn, solution)
 
     let private bindClock (formula:Formula) :CRN =
-        let clockPhases = Clock.stepPeriod * List.length formula
+        let clockPhases = Clock.stepPeriod * List.length formula |> max 3 // the clock needs at least 3 phases to oscillate
         let clockCRN = Modules.clock clockPhases
 
         let bindClockStep stepIndex step =
@@ -123,7 +166,10 @@ module Simulator =
         names, simulate' crnUpdater crn
 
     let simulateFormula (formula:Formula) =
-        simulateFormula' crnUpdater formula
+        // simulateFormula' crnUpdater formula
+        let crn = ofFormula formula
+        let names = snd crn |> Map.keys |> Set.ofSeq
+        names, simulateFast crn
 
     let extractConcentrations (names:Name Set) (duration:float) (crn:CRN seq) =
         let (slns, xs) = Seq.initInfinite timeAtIteration 
