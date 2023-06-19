@@ -30,14 +30,16 @@ let main argv =
       0
    else
       let code = IO.File.ReadAllText(argv.[1])
-      // test pcrn code
       let program = parse code
-      printf "%A" (convert program)
-      drawAst program
-      let n = 10
-      let xs = [1..n] |> List.map float
-      BasicInterperter.run program
-         |> BasicInterperter.envSeqToConc n
-         |> List.map (fun (n, ys) -> Rendering.Plotting.scatter xs ys n) 
-         |> Rendering.Plotting.showPlots "GCD basic interpreter"
+      printfn "%A" (Interpreter.getInitialConcentrations program)
+      printfn "%A" (Interpreter.convertAstToFormula program)
+      // printf "%A" (convert program)
+      // drawAst program
+
+      // let n = 10
+      // let xs = [1..n] |> List.map float
+      // BasicInterperter.run program
+      //    |> BasicInterperter.envSeqToConc n
+      //    |> List.map (fun (n, ys) -> Rendering.Plotting.scatter xs ys n)
+      //    |> Rendering.Plotting.showPlots "GCD basic interpreter"
       0
