@@ -15,8 +15,8 @@ module Plotting =
 
     let line x y label=
         Chart.Line (Seq.zip x y, Name=label, ShowMarkers=false, LineWidth=5)
-        |> Chart.withXAxisStyle ("time")
-        |> Chart.withYAxisStyle ("concentration")
+        // |> Chart.withXAxisStyle ("x")
+        // |> Chart.withYAxisStyle ("error")
         |> P
 
     let surface x y z xLabel yLabel zLabel =
@@ -30,6 +30,7 @@ module Plotting =
     let showPlot title (P(chart)) =
         chart
         |> Chart.withTitle(Title.init(title))
+        // |> Chart.withLayoutStyle (Width=500, Height=500)
         |> Chart.show
 
     let showPlots title ps = 

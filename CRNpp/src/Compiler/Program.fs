@@ -29,6 +29,8 @@ let main argv =
       // Errors.Modules.add ()
       // Errors.Modules.sub ()
       // Errors.Modules.subAGtB ()
+      // Errors.Modules.subOneOff ()
+      // Errors.Modules.subMinus1 ()
       // Errors.Modules.mul ()
       // Errors.Modules.div ()
       0
