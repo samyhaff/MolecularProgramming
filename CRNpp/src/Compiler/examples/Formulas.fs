@@ -7,11 +7,11 @@ module Formulas =
     open ChemicalEngine.Modules
     open Rendering.Plotting
 
-    let showCycles duration species title formula = 
-        let filter = Simulator.onlyBySpecies species
+    let showCycles duration species title formula =
         let plot (xs,data) = 
             data |> List.map (fun (n, ys) -> line xs ys n) |> showPlots title
 
+        let filter = Simulator.onlyBySpecies species
         Simulator.watch duration formula |> plot
         Simulator.watchFiltered duration filter formula |> plot
 

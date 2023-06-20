@@ -37,3 +37,13 @@ module Plotting =
         |> Chart.withTitle(Title.init(title))
         |> Chart.withLayoutStyle (Width=600, Height=800)
         |> Chart.show
+
+    let showLabelledPlots title xLabel yLabel size ps =
+        ps 
+        |> Seq.map (fun (P(chart)) -> chart)
+        |> Chart.combine
+        |> Chart.withTitle(Title.init(title))
+        |> Chart.withXAxisStyle (xLabel)
+        |> Chart.withYAxisStyle (yLabel)
+        |> Chart.withLayoutStyle(Width=fst size, Height=snd size)
+        |> Chart.show

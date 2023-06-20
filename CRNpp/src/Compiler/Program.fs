@@ -12,9 +12,13 @@ let main argv =
       // ChemicalEngine.Checks.runAll ()
       // Examples.Modules.watchModule (fun () -> ChemicalEngine.Modules.sub ("A",131.218572) ("B",24.45533649) ("C",46.70537003)) "sub test"
       // Examples.Modules.add ()
+      // Examples.Modules.subAgtB ()
+      // Examples.Modules.subAltB ()
       // Examples.Modules.mul ()
       // Examples.Modules.div ()
-      // Examples.Modules.clock 3
+      // Examples.Modules.divBy0 ()
+      // Examples.Modules.sqrt ()
+      Examples.Modules.clock ()
       // Examples.Modules.cmp ()
       // Examples.Modules.ifGt ()
       // Examples.Modules.clock 3
