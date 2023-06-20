@@ -15,6 +15,7 @@
     <Compile Include="TypeChecker.fs" />
     <Compile Include="BasicInterpreter.fs" />
     <Compile Include="Interpreter.fs" />
+    <Compile Include="ParserChecks.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

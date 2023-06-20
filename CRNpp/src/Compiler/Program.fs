@@ -31,6 +31,7 @@ let main argv =
    else
       let code = IO.File.ReadAllText(argv.[1])
       let program = parse code
+      printf "%s" (ParserChecks.crnToString program)
       // printfn "%A" program
       // printfn "Initial Concentrations: %A" (getInitialConcentrations program)
       // printfn "%A" (convertAstToFormula program)
