@@ -1,19 +1,20 @@
-// Author: Roar Nind Steffensen, 16/06/2023
+// Author: Roar Nind Steffensen, 20/06/2023
 
 namespace Examples
 
 module Formulas = 
     open ChemicalEngine
-    open ChemicalEngine.Modules
+    open Modules
+    open Reaction
     open Rendering.Plotting
 
     let showCycles duration species title formula =
         let plot filter (xs,data) = 
             data |> filter |> List.map (fun (n, ys) -> line xs ys n) |> showPlots title
 
-        let output = Simulator.watch duration formula
-        // output |> Simulator.shrinkData |> plot id // for plotting all signals
-        output |> Simulator.shrinkData |> plot (Simulator.onlyBySpecies species)
+        let output = Simulator.watch duration formula |> Simulator.shrinkData
+        // output |> plot id // for plotting all signals
+        output |> plot (Simulator.onlyBySpecies species)
         
     let factorial n = 
         printfn "Calculating factorial formula"
@@ -100,3 +101,85 @@ module Formulas =
             ]
         ]
         showCycles 400.0 [piS] "pi 3.1415..." formula
+
+
+    let discrete_counter n =
+        printfn $"discrete counter formula for {n}"
+
+        let cS = ("c", float n)
+        let cinitialS = ("cInitial", conc cS)
+        let oneS = ("one", 1.0)
+        let zeroS = ("zero", 0.0)
+
+        let cnextS = ("cnext", 0.0)
+
+        let formula = [
+            [
+                sub cS oneS cnextS;
+                cmp cS zeroS;
+            ]
+            [
+                ifGt [ ld cnextS cS]
+                ifLe [ ld cinitialS cS]
+            ]
+        ]
+
+        showCycles 2000.0 [cS] $"discrete counter of {n}" formula
+
+    let division a0 b0 =
+        printfn $"division formula for a0={a0} and b0={b0}"
+
+        let aS = ("a", float a0)
+        let bS = ("b", float b0)
+        let oneS = ("one", 1.0)
+
+        let anextS = ("anext", 0.0)
+        let qS = ("q", 0.0)
+        let qnextS = ("qnext", 0.0)
+        let rS = ("r", 0.0)
+
+        let formula = [
+            [ // step 1
+                cmp aS bS;
+            ]
+            [ // step 2
+                ifGe [
+                    sub aS bS anextS
+                    add qS oneS qnextS
+                ]
+            ]
+            [ // step 3
+                ifGe [
+                    ld anextS aS
+                    ld qnextS qS
+                ]
+                ifLt [ld aS rS]
+            ]
+        ]
+        showCycles 2000.0 [aS;bS;qS;rS;] $"division a0={a0}, b0={b0}" formula
+
+    let integer_square_root n0 =
+        printfn $"integer square root formula for n0={n0}"
+
+        let nS = ("n", float n0)
+        let oneS = ("one", 1.0)
+
+        let zS = ("z", 0.0)
+        let znextS = ("znext", 0.0)
+        let zpowS = ("zpow", 0.0)
+        let outS = ("out", 0.0)
+
+        let formula = [
+            [ // step 1
+                add zS oneS znextS
+                mul znextS znextS zpowS
+                cmp zpowS nS
+            ]
+            [ // step 2
+                ifLt [ld znextS zS]
+                ifGe [ld zS outS]
+            ]
+        ]
+
+        showCycles 2000.0 [zS; zpowS; outS] $"integer square root n0={n0}" formula
+
