@@ -8,5 +8,42 @@ Date: 22/06/2023
 
 
 Program contributions:
+	Compiler Project:
+		Ast - Samy
+		Visualizer - Samy
+		Parser - Samy
+		Examples.Modules - Roar
+		Examples.Clocks - Roar
+		Examples.Formulas - Roar
+		Examples.Reaction - Samy
+		Errors.ModuleErrors - Roar
+		TypeChecker - Samy
+		BasicInterpreter - Roar
+		Program - Changed by all
+
+	ChemicalEngine Project:
+		Clock - Roar
+		Reaction - Roar
+		CRN - Roar
+		Parser - Samy
+		Command - Roar
+		Modules - Roar
+		Simulator - Roar
+		FakeClockSimulator - Roar
+		Checks - Roar
+
+	Rendering Project:
+		Plots - Roar
+
+	DrawingTrees Project - Copied from project 1
 
 Report contributions:
+	Introduction - Roar
+	...
+	...
+	...
+	2.2 CRN reactions simulator - Roar
+	2.3 Simulation evaluations - Roar
+	3 CRN compilations - Roar
+	3.1 Evaluation of simulated compilations - Roar
+	Appendix analysis + figures - Roar
