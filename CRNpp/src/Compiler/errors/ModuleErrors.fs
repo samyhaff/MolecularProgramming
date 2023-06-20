@@ -1,3 +1,5 @@
+// Author: Roar Nind Steffensen, 19/06/2023
+
 namespace Errors
 
 module Modules =
