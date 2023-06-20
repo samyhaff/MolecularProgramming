@@ -13,11 +13,11 @@ let rec commandToString (command: Command) : string =
    | Sub(s1, s2, s3) -> sprintf "sub[%s, %s, %s]" s1 s2 s3
    | Mul(s1, s2, s3) -> sprintf "mul[%s, %s, %s]" s1 s2 s3
    | Div(s1, s2, s3) -> sprintf "div[%s, %s, %s]" s1 s2 s3
-   | Ifgt(commands) -> sprintf "ifgt[ %s] " (String.concat ", " (List.map commandToString commands))
-   | Ifeq(commands) -> sprintf "ifeq[ %s] " (String.concat ", " (List.map commandToString commands))
-   | Ifge(commands) -> sprintf "ifeq[ %s] " (String.concat ", " (List.map commandToString commands))
-   | Ifle(commands) -> sprintf "ifeq[ %s] " (String.concat ", " (List.map commandToString commands))
-   | Iflt(commands) -> sprintf "ifeq[ %s] " (String.concat ", " (List.map commandToString commands))
+   | Ifgt(commands) -> sprintf "ifGT[ %s] " (String.concat ", " (List.map commandToString commands))
+   | Ifeq(commands) -> sprintf "ifEQ[ %s] " (String.concat ", " (List.map commandToString commands))
+   | Ifge(commands) -> sprintf "ifGE[ %s] " (String.concat ", " (List.map commandToString commands))
+   | Ifle(commands) -> sprintf "ifLE[ %s] " (String.concat ", " (List.map commandToString commands))
+   | Iflt(commands) -> sprintf "ifLT[ %s] " (String.concat ", " (List.map commandToString commands))
 
 let crnToString (ast: Crn) : string =
    let rec aux ast =
