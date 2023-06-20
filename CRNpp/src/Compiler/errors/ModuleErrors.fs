@@ -7,7 +7,7 @@ module Modules =
 
     let private runCmd = 
         Command.toCRN
-        >> Simulator.simulate
+        >> Simulator.simulateFast
         >> Seq.skip (Simulator.stepsInDuration Simulator.approxCycleDuration)
         >> Seq.head
 
@@ -29,37 +29,42 @@ module Modules =
     let B c= ("B", c)
     let C = ("C", 0.0)
 
-    let add () =
-        plotError "add error" (fun a b ->
-            let simulated = Modules.add (A a) (B b) C |> eval C
-            let expected = a + b
-            abs (expected - simulated)
-        )
+    let private addError a b =
+        let simulated = Modules.add (A a) (B b) C |> eval C
+        let expected = a + b
+        abs (expected - simulated)
+    let add () = plotError "add error" addError
 
+    let private subError a b =
+        let simulated = Modules.sub (A a) (B b) C |> eval C
+        let expected = if a > b then a - b else 0.0
+        abs (expected - simulated)
     let sub () =
-        plotError "sub error" (fun a b ->
-            let simulated = Modules.sub (A a) (B b) C |> eval C
-            let expected = if a > b then a - b else 0.0
-            abs (expected - simulated)
-        )
+        plotError "sub error" subError
 
     let subAGtB () =
-        plotError "sub error on domain: A >= B" (fun a b ->
-            let simulated = if a >= b then Modules.sub (A a) (B b) C |> eval C else 0.0
-            let expected = if a > b then a - b else 0.0
-            abs (expected - simulated)
-        )
+        plotError "sub error on domain: A >= B" (fun a b -> if a >= b then subError a b else 0.0)
 
-    let mul () =
-        plotError "mul error" (fun a b ->
-            let simulated = Modules.mul (A a) (B b) C |> eval C
-            let expected = a * b
-            abs (expected - simulated)
-        )
+    let subOneOff () =
+        let range = [1..500] |> List.map float
+        let data = List.map (fun x -> subError (x+1.0) x) range
+        line range data "" |> showPlot "sub: (x+1) - x"
 
-    let div () =
-        plotError "div error" (fun a b ->
-            let simulated = Modules.div (A a) (B b) C |> eval C
-            let expected = a / b
-            abs (expected - simulated)
-        )
+    let subMinus1 () =
+        let range = [1..500] |> List.map float
+        let data = List.map (fun x -> subError x 1.0) range
+        line range data "" |> showPlot "sub: x - 1"
+
+
+
+    let private mulError a b =
+        let simulated = Modules.mul (A a) (B b) C |> eval C
+        let expected = a * b
+        abs (expected - simulated)
+    let mul () = plotError "mul error" mulError
+
+    let private divError a b =
+        let simulated = Modules.div (A a) (B b) C |> eval C
+        let expected = a / b
+        abs (expected - simulated)
+    let div () = plotError "div error" divError

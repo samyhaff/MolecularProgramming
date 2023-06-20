@@ -190,11 +190,26 @@ module Simulator =
         let (xs, data) = watch duration formula
         in (xs, filter data)
 
+    let onlyByNames names =
+        List.filter (fun (n, _) -> List.contains n names)
+
+    let onlyBySpecies species =
+        onlyByNames (List.map name species)
+
+    let removeByNamePrefixes (prefixes:string list) =
+        let startsWith (n:string) :bool = List.exists (n.StartsWith:string->bool) prefixes
+        List.filter (fst >> startsWith >> not) 
+
     let removeClock data =
-        List.filter (fst >> Clock.isClockSpecies >> not) data
+        removeByNamePrefixes [Clock.clockSpeciesPrefix] data
 
-    let onlyByNames names data =
-        List.filter (fun (n, _) -> List.contains n names) data
+    let shrinkData (xs,data) =
+        let chunkSize = 1.0/resolution |> int
+        let shrink f list =
+            let chunks = List.chunkBySize chunkSize list
+            List.foldBack (fun chunk list -> f chunk :: list) chunks []
 
-    let onlyBySpecies species data =
-        onlyByNames (List.map name species) data
+        let shrinkData = shrink (fun f -> List.sum f / float chunkSize)
+        let shrinkXs = shrink List.head
+
+        in shrinkXs xs, List.map (fun (n,list) -> (n, shrinkData list)) data

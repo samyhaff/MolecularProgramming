@@ -5,12 +5,11 @@ namespace ChemicalEngine
 module Clock =
     let stepPeriod = 2
     let stepPeriodF = float stepPeriod
-
-    let isClockSpecies (name:string) =
-        name.StartsWith("clc")
+    let clockSpeciesPrefix = "clc"
 
     let clockSpeciesName step = 
-        $"clc{step}"
+        $"{clockSpeciesPrefix}{step}"
+
     let clockSpeciescConc clockPhases step = 
         let offset = 0.0000000089714 // configured for a 3 phase clock to have a phase duration of 20
         let mainConc = 0.5 - offset / 2.0

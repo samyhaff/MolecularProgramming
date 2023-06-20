@@ -13,6 +13,12 @@ module Plotting =
         Chart.Scatter(X=x, Y=y, Mode=Mode.Lines_Markers, Name=label)
         |> P
 
+    let line x y label=
+        Chart.Line (Seq.zip x y, Name=label, ShowMarkers=false, LineWidth=5)
+        // |> Chart.withXAxisStyle ("x")
+        // |> Chart.withYAxisStyle ("error")
+        |> P
+
     let surface x y z xLabel yLabel zLabel =
         let axis title = LinearAxis.init (Title=Title.init title)
 
@@ -24,6 +30,7 @@ module Plotting =
     let showPlot title (P(chart)) =
         chart
         |> Chart.withTitle(Title.init(title))
+        // |> Chart.withLayoutStyle (Width=500, Height=500)
         |> Chart.show
 
     let showPlots title ps = 
@@ -31,4 +38,15 @@ module Plotting =
         |> Seq.map (fun (P(chart)) -> chart)
         |> Chart.combine
         |> Chart.withTitle(Title.init(title))
+        // |> Chart.withLayoutStyle (Width=600, Height=800)
+        |> Chart.show
+
+    let showLabelledPlots title xLabel yLabel size ps =
+        ps 
+        |> Seq.map (fun (P(chart)) -> chart)
+        |> Chart.combine
+        |> Chart.withTitle(Title.init(title))
+        |> Chart.withXAxisStyle (xLabel)
+        |> Chart.withYAxisStyle (yLabel)
+        |> Chart.withLayoutStyle(Width=fst size, Height=snd size)
         |> Chart.show
