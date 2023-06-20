@@ -213,7 +213,7 @@ module Formulas =
             elapsedMs
 
         printfn "CRN's of n parallel add modules: Slow simulator"
-        let slowData = parallel_compilations 4 |> List.mapi (testTime Simulator.simulate)
+        let slowData = parallel_compilations 4 |> List.mapi (testTime (Simulator.simulate' Simulator.slowCrnUpdater))
 
         printfn "CRN's of n parallel add modules: Fast simulator"
         let fastData = parallel_compilations 15 |> List.mapi (testTime Simulator.simulateFast)
@@ -223,7 +223,7 @@ module Formulas =
 
 
         printfn "CRN's of n steps each with 1 add module: Slow simulator"
-        let slowData = step_compilations 4 |> List.mapi (testTime ((Simulator.simulateFormula' Simulator.crnUpdater)>>snd))
+        let slowData = step_compilations 4 |> List.mapi (testTime ((Simulator.simulateFormula' Simulator.slowCrnUpdater)>>snd))
 
         printfn "CRN's of n steps each with 1 add module: Fast simulator"
         let fastData = step_compilations 15 |> List.mapi (testTime (Simulator.simulateFormula>>snd))

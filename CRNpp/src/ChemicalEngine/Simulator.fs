@@ -43,7 +43,7 @@ module Simulator =
     let private update (crn:CRN) =
         let updatedSolution = Map.map (fun _ species -> updateSpecies crn species) (snd crn)
         in (fst crn, updatedSolution)
-    let crnUpdater time crn = 
+    let slowCrnUpdater time crn = 
         // if time = ceil time then printfn $"simulating time {time}" else ()
         update crn
 
@@ -51,7 +51,6 @@ module Simulator =
         let rec simulate' (crn:CRN) n =
             seq {yield crn; yield! simulate' (crnUpdater (timeAtIteration n) crn) (n+1)}
         in simulate' crn 1
-    let simulate = simulate' crnUpdater
     
     let simulateFast (crn:CRN) :CRN seq =
         let names = (snd crn) |> Map.keys |> Seq.toList
