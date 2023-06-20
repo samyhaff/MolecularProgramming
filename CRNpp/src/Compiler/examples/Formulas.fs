@@ -8,17 +8,15 @@ module Formulas =
     open Rendering.Plotting
 
     let showCycles duration species title formula =
-        let plot (xs,data) = 
-            data |> List.map (fun (n, ys) -> line xs ys n) |> showPlots title
+        let plot filter (xs,data) = 
+            data |> filter |> List.map (fun (n, ys) -> line xs ys n) |> showPlots title
 
-        let filter = Simulator.onlyBySpecies species
-        Simulator.watch duration formula |> plot
-        Simulator.watchFiltered duration filter formula |> plot
-
-        // let (xs, data) = Simulator.watchFiltered duration filter formula |> Simulator.shrinkData
-        // data |> List.map (fun (n, ys) -> line xs ys n) |> showPlots title
+        let output = Simulator.watch duration formula
+        // output |> Simulator.shrinkData |> plot id // for plotting all signals
+        output |> Simulator.shrinkData |> plot (Simulator.onlyBySpecies species)
         
     let factorial n = 
+        printfn "Calculating factorial formula"
     
         let fS = ("f", 1.0)
         let oneS = ("one", 1.0)
@@ -43,6 +41,8 @@ module Formulas =
         showCycles 800.0 [fS] $"factorial: {n}!" formula
 
     let eulersConstant () =
+        printfn "Calculating eulers constant formula"
+
         let eS = ("e", 1.0)
         let elementS = ("element", 1.0)
         let divisorS = ("divisor", 1.0)
@@ -66,10 +66,12 @@ module Formulas =
             ]
         ]
 
-        showCycles 500.0 [eS] "eulers constant 2.718..." formula
+        showCycles 350.0 [eS] "eulers constant 2.718..." formula
 
 
     let pi () = 
+        printfn "Calculating pi formula"
+
         let fourS = ("four", 4.0)
         let divisor1S = ("divisor1", 1.0)
         let divisor2S = ("divisor2", 3.0)
@@ -97,4 +99,4 @@ module Formulas =
                 ld piNextS piS
             ]
         ]
-        showCycles 500.0 [piS] "pi 3.1415..." formula
+        showCycles 400.0 [piS] "pi 3.1415..." formula
