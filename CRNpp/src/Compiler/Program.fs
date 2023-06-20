@@ -36,6 +36,7 @@ let main argv =
       // Errors.Modules.subMinus1 ()
       // Errors.Modules.mul ()
       // Errors.Modules.div ()
+      // Examples.Formulas.simulatorPerformance()
       0
    else
       let code = IO.File.ReadAllText(argv.[1])

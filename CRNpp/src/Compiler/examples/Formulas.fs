@@ -8,13 +8,17 @@ module Formulas =
     open Reaction
     open Rendering.Plotting
 
-    let showCycles duration species title formula =
-        let plot filter (xs,data) = 
-            data |> filter |> List.map (fun (n, ys) -> line xs ys n) |> showPlots title
+    let private plot filter title (xs,data) = 
+        data |> filter |> List.map (fun (n, ys) -> line xs ys n) |> showPlots title
+    let private showCycles duration species title formula =
+        let output = Simulator.watch duration formula |> Simulator.shrinkData
+        // output |> plot id title // for plotting all signals
+        output |> plot (Simulator.onlyBySpecies species) title
+    
+    let private showAll duration title formula = 
 
         let output = Simulator.watch duration formula |> Simulator.shrinkData
-        // output |> plot id // for plotting all signals
-        output |> plot (Simulator.onlyBySpecies species)
+        output |> plot id title // for plotting all signals
         
     let factorial n = 
         printfn "Calculating factorial formula"
@@ -183,3 +187,46 @@ module Formulas =
 
         showCycles 2000.0 [zS; zpowS; outS] $"integer square root n0={n0}" formula
 
+    let simulatorPerformance () = 
+        let nAddModules n =
+            [0..n] 
+                |> List.map (fun i -> add ($"a{i}", 1.0) ($"b{i}", 2.0) ($"c{i}", 0.0))
+
+        let parallel_compilations n :CRN list= 
+            Seq.initInfinite id
+            |> Seq.map (fun i -> nAddModules i |> List.map Command.toCRN |> CRN.collect)
+            |> Seq.take n
+            |> Seq.toList
+
+        let step_compilations n :Formula list= 
+            Seq.initInfinite id
+            |> Seq.map (fun i -> [0..i] |> List.map (fun _ -> nAddModules 1))
+            |> Seq.take n
+            |> Seq.toList
+
+        let steps = 100_000
+        let testTime simulator i compilation =
+            let start = System.Diagnostics.Stopwatch.GetTimestamp ()
+            compilation |> simulator |> Seq.skip steps |> Seq.head |> ignore
+            let elapsedMs = (System.Diagnostics.Stopwatch.GetElapsedTime start).TotalMilliseconds
+            printfn $"{i+1}: {elapsedMs} ms"
+            elapsedMs
+
+        printfn "CRN's of n parallel add modules: Slow simulator"
+        let slowData = parallel_compilations 4 |> List.mapi (testTime Simulator.simulate)
+
+        printfn "CRN's of n parallel add modules: Fast simulator"
+        let fastData = parallel_compilations 15 |> List.mapi (testTime Simulator.simulateFast)
+        let data = [("fast", fastData); ("original", slowData)]
+
+        data |> List.map (fun (n, ys) -> line ([1..List.length ys] |> List.map float) ys n) |> showPlots "performance improvement for n parallel add modules in 1 step"
+
+
+        printfn "CRN's of n steps each with 1 add module: Slow simulator"
+        let slowData = step_compilations 4 |> List.mapi (testTime ((Simulator.simulateFormula' Simulator.crnUpdater)>>snd))
+
+        printfn "CRN's of n steps each with 1 add module: Fast simulator"
+        let fastData = step_compilations 15 |> List.mapi (testTime (Simulator.simulateFormula>>snd))
+        let data = [("fast", fastData); ("original", slowData)]
+
+        data |> List.map (fun (n, ys) -> line ([1..List.length ys] |> List.map float) ys n) |> showPlots "performance improvement for n steps each with 1 add module"
