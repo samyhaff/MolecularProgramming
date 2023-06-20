@@ -26,6 +26,9 @@ let main argv =
       // Examples.Formulas.factorial 5
       // Examples.Formulas.eulersConstant ()
       // Examples.Formulas.pi ()
+      // Examples.Formulas.discrete_counter 3
+      // Examples.Formulas.division 20 3
+      // Examples.Formulas.integer_square_root 10
       // Errors.Modules.add ()
       // Errors.Modules.sub ()
       // Errors.Modules.subAGtB ()
