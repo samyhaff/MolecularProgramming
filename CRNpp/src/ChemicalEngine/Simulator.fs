@@ -198,3 +198,14 @@ module Simulator =
 
     let onlyBySpecies species data =
         onlyByNames (List.map name species) data
+
+    let shrinkData (xs,data) =
+        let chunkSize = 1.0/resolution |> int
+        let shrink f list =
+            let chunks = List.chunkBySize chunkSize list
+            List.foldBack (fun chunk list -> f chunk :: list) chunks []
+
+        let shrinkData = shrink (fun f -> List.sum f / float chunkSize)
+        let shrinkXs = shrink List.head
+
+        in shrinkXs xs, List.map (fun (n,list) -> (n, shrinkData list)) data
