@@ -40,7 +40,7 @@ module Plotting =
         |> Seq.map (fun (P(chart)) -> chart)
         |> Chart.combine
         |> Chart.withTitle(Title.init(title))
-        |> Chart.withLayoutStyle (Width=600, Height=800)
+        // |> Chart.withLayoutStyle (Width=600, Height=800)
         |> Chart.show
 
     let showLabelledPlots title xLabel yLabel size ps =
