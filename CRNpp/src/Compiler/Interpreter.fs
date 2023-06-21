@@ -82,11 +82,11 @@ let convertAstToFormula (ast: Crn) :Reaction.Formula =
             in step::(convertRoot rest)
     in convertRoot ast
 
-let showCycles duration species title formula =
-    let filter = Simulator.onlyBySpecies species
+let showCycles duration names title formula =
+    let filter = Simulator.onlyByNames names
     let (xs, data) = Simulator.watchFiltered duration filter formula
     data |> List.map (fun (n, ys) -> scatter xs ys n) |> showPlots title
 
 let run (ast: Crn) (duration: float) (species: string list) (title: string) =
     let formula = convertAstToFormula ast
-    showCycles duration (List.map (fun s -> s, 0.0) species)  title formula
+    showCycles duration species title formula
