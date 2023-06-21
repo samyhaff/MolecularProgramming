@@ -72,9 +72,7 @@ module Modules =
         fromReactionAndSpecies reactions [A;B] |> Normal
 
     let cmpE = ("cmpE", 0.5)
-    let cmpX = ("cmpX", 0.0)
     let cmpXE = ("cmpXE", 0.0)
-    let cmpY = ("cmpY", 0.0)
     let cmpYE = ("cmpYE", 0.0)
     let cmpXEgtY = ("cmpXEgtY", 0.5)
     let cmpXEltY = ("cmpXEltY", 0.5)
@@ -105,18 +103,13 @@ module Modules =
 
     let cmp A B =
         [
-            ld A cmpX;
             add A cmpE cmpXE;
-            ld B cmpY;
             add B cmpE cmpYE;
+            cmpMapping cmpXE B cmpXEgtY cmpXEltY;
+            cmpMapping cmpYE A cmpYEgtX cmpYEltX;
         ] |> Cmp
 
     let cmpStep2 () :Step = 
-        [
-            cmpMapping cmpXE cmpY cmpXEgtY cmpXEltY;
-            cmpMapping cmpYE cmpX cmpYEgtX cmpYEltX;
-        ]
-    let cmpStep3 () :Step =
         [
             cmpApproximateMajority cmpXEgtY cmpXEltY cmpB1;
             cmpApproximateMajority cmpYEgtX cmpYEltX cmpB2;
