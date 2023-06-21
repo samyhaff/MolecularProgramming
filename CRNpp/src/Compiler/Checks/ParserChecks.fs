@@ -49,5 +49,10 @@ module ParserChecks =
       true
 
    let runAll () =
+      printfn $"Running Parser checks"
+      let checkQuick lbl prop = Check.One ({Config.Quick with Name = lbl; EndSize = 20}, prop)
       Arb.register<AstGenerator.CustomGenerator>() |> ignore
-      Check.One ({Config.Verbose with StartSize = 1; EndSize = 10}, parserCheck)
+
+      checkQuick "same as stringified ast" parserCheck
+
+      printfn $"Parser checks done"

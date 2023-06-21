@@ -134,7 +134,7 @@ module AstGenerator =
             let! (s, env') = newSpeciesG env
             let! c = Arb.generate<NormalFloat> 
                     |> Gen.map NormalFloat.op_Explicit 
-                    |> Gen.where ((<) 0.0)  // only positive concentrations are possible
+                    |> Gen.where ((<=) 0.0)  // only non-negative concentrations are possible
                     |> Gen.map (fun c -> System.Math.Round(c, 3)) // restrict decimals to avoid parse truncating
             return ((s, c), env')
         } |> Gen.map (fun (sc, env) -> Conc sc, env)
