@@ -13,6 +13,14 @@ let rec convert (ast: Crn) : Tree<string> =
          let rec commandConvert commands =
             match commands with
             | []  -> []
+            | Rxn(reactants, products, rate)::rest ->
+               let name (S s) = s
+               let sep = " + "
+               Node(
+                  $"Rxn({String.concat sep (List.map name reactants)},
+                  {String.concat sep (List.map name products)},
+                  {rate})", []
+               )::(commandConvert rest)
             | Load(s1, s2)::rest -> Node($"Load({s1}, {s2})", [])::(commandConvert rest)
             | Add(s1, s2, s3)::rest -> Node($"Add({s1}, {s2}, {s3})", [])::(commandConvert rest)
             | Sub(s1, s2, s3)::rest -> Node($"Sub({s1}, {s2}, {s3})", [])::(commandConvert rest)

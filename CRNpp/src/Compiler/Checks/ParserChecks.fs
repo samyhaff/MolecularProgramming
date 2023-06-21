@@ -20,6 +20,7 @@ module ParserChecks =
       | Ifge(commands) -> sprintf "ifGE[ %s] " (String.concat ", " (List.map commandToString commands))
       | Ifle(commands) -> sprintf "ifLE[ %s] " (String.concat ", " (List.map commandToString commands))
       | Iflt(commands) -> sprintf "ifLT[ %s] " (String.concat ", " (List.map commandToString commands))
+      | Rxn(_) -> failwith "Never generated"
 
    let crnToString (ast: Crn) : string =
       let rec aux ast =
@@ -38,7 +39,7 @@ module ParserChecks =
       let astString = crnToString ast in
       let parsedAst = parse astString in
       let check = parsedAst = ast
-      if not check 
+      if not check
       then printfn "check failed, parsed: \n%A" parsedAst; check
       else check
 

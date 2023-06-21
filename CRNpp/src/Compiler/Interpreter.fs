@@ -24,6 +24,17 @@ let getInitialConcentrations (ast: Crn) : Map<string, float> =
                      getUnboundSpecies rest (Map.add s 0.0 env)
                   else
                      getUnboundSpecies rest env
+               | Rxn(reactants, products, _)::rest ->
+                   let rec getUnboundSpeciesChemicals chemicals env =
+                     match chemicals with
+                     | [] -> env
+                     | S s::rest ->
+                        if not (Map.containsKey s env) then
+                            getUnboundSpeciesChemicals rest (Map.add s 0.0 env)
+                        else
+                            getUnboundSpeciesChemicals rest env
+                   let env' = getUnboundSpeciesChemicals products env
+                   getUnboundSpecies rest env'
                | Ifgt(commands)::rest
                | Iflt(commands)::rest
                | Ifge(commands)::rest
@@ -80,6 +91,15 @@ let convertAstToFormula (ast: Crn) :Reaction.Formula =
                         | Ifge(_) -> (Modules.ifGe convertedCommands)::(convertCommands rest)
                         | Ifle(_) -> (Modules.ifLe convertedCommands)::(convertCommands rest)
                         | _ -> failwith "Impossible"
+                    | Rxn(reactants, products, rate)::rest ->
+                        let name = List.map (fun (S s) -> s)
+                        let r = name reactants
+                        let p = name products
+                        let concentrationsReactants = List.map (fun (S s) -> Map.find s env) reactants
+                        let concentrationsProducts = List.map (fun (S s) -> Map.find s env) products
+                        ((Modules.rxn
+                            (List.zip r concentrationsReactants) rate (List.zip p concentrationsProducts))
+                        |> Reaction.Normal)::(convertCommands rest)
                     | _ -> failwith "Impossible"
             let step = convertCommands commands
             in step::(convertRoot rest)

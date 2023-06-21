@@ -21,6 +21,17 @@ let pconc: Parser<Root> =
       (pnumber .>> ws .>> skipChar ']')
       (fun s n -> Conc(S s, n))
 
+let pexpr: Parser<string list> =
+   sepBy (pspecies .>> ws) (skipChar '+' >>. ws)
+
+let prxn: Parser<Command> =
+   skipString "rxn" >>. skipChar '[' >>. ws
+   >>. pipe3
+      (pexpr .>> skipChar ',' .>> ws)
+      (pexpr .>> skipChar ',' .>> ws)
+      (pnumber .>> ws .>> skipChar ']')
+      (fun expr1 expr2 rate -> Rxn(List.map S expr1, List.map S expr2, rate))
+
 let ptwoargs (command: string) : Parser<Command> =
     skipString command >>. ws >>. skipChar '[' >>. ws
     >>. pipe2
@@ -63,7 +74,7 @@ let (pifle, pifleimpl): Parser<Command> * Parser<Command> ref = createParserForw
 let (pifeq, pifeqimpl): Parser<Command> * Parser<Command> ref = createParserForwardedToRef ()
 
 let pcommand: Parser<Command> =
-    choiceL [pload; padd; psub; pmul; pdiv; psqrt; pcmp; pifgt; pifge; piflt; pifle; pifeq] "command"
+    choiceL [pload; prxn; padd; psub; pmul; pdiv; psqrt; pcmp; pifgt; pifge; piflt; pifle; pifeq] "command"
 
 let pcommands: Parser<Command list> =
    sepBy (pcommand .>> ws) (skipChar ',' >>. ws)
