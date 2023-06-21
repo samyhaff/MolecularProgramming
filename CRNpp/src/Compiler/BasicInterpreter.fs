@@ -22,17 +22,17 @@ and runCommand env command =
     let setflag f = {env with flag = f}
     let vars = env.variables
     match command with 
-    | Load(a,b)     -> setvars <| Map.add b (Map.find a vars) vars
-    | Add(a,b,c)    -> setvars <| Map.add c (Map.find a vars + Map.find b vars) vars
-    | Sub(a,b,c)    -> setvars <| Map.add c (Map.find a vars - Map.find b vars) vars
-    | Mul(a,b,c)    -> setvars <| Map.add c (Map.find a vars * Map.find b vars) vars
-    | Div(a,b,c)    -> setvars <| Map.add c (Map.find a vars / Map.find b vars) vars
-    | Sqrt(a,b)     -> setvars <| Map.add b (Map.find a vars |> sqrt) vars
-    | Cmp(a,b)      -> setflag <| let va,vb = Map.find a vars, Map.find b vars
-                                  in match (va,vb) with 
-                                     | _ when floatEquals va vb -> Equal 
-                                     | _ when va > vb -> Greater 
-                                     | _ -> Less
+    | Load(S a, S b)        -> setvars <| Map.add b (Map.find a vars) vars
+    | Add(S a, S b, S c)    -> setvars <| Map.add c (Map.find a vars + Map.find b vars) vars
+    | Sub(S a, S b, S c)    -> setvars <| Map.add c (Map.find a vars - Map.find b vars) vars
+    | Mul(S a, S b, S c)    -> setvars <| Map.add c (Map.find a vars * Map.find b vars) vars
+    | Div(S a, S b, S c)    -> setvars <| Map.add c (Map.find a vars / Map.find b vars) vars
+    | Sqrt(S a, S b)        -> setvars <| Map.add b (Map.find a vars |> sqrt) vars
+    | Cmp(S a, S b)         -> setflag <| let va,vb = Map.find a vars, Map.find b vars
+                                            in match (va,vb) with 
+                                                | _ when floatEquals va vb -> Equal 
+                                                | _ when va > vb -> Greater 
+                                                | _ -> Less
     | Ifgt(cs)      -> if env.flag = Greater then runCommands env cs else env
     | Ifge(cs)      -> if env.flag <> Less then runCommands env cs else env
     | Iflt(cs)      -> if env.flag = Less then runCommands env cs else env
@@ -43,7 +43,7 @@ let runStep env commands =
     runCommands env commands
 
 let run (crn:Crn) = 
-    let envVars = crn |> List.fold (fun acc r -> match r with |Step _ -> acc| Conc(s,f) -> (s,f)::acc) [] |> Map.ofList
+    let envVars = crn |> List.fold (fun acc r -> match r with |Step _ -> acc| Conc(S s,f) -> (s,f)::acc) [] |> Map.ofList
     let env = {variables = envVars; flag = Equal} // rely in type checker: flag is set before conditional command
 
     let steps = crn |> List.fold (fun acc r -> match r with |Conc _ -> acc| Step cs -> cs::acc) []

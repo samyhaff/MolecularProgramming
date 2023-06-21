@@ -1,6 +1,6 @@
 module Ast
 
-type species = string
+type species = S of string
 
 type Command =
    | Load of species * species
