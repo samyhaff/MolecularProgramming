@@ -30,7 +30,8 @@ Program contributions:
 		CRN - Roar
 		Parser - Samy
 		Command - Roar
-		Modules - Roar
+		Modules.cmp - Roar and Valeriu
+		Modules - all others: Roar
 		Simulator - Roar
 		FakeClockSimulator - Roar
 		Checks::cmp - Valeriu
