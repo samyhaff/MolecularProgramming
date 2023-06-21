@@ -14,6 +14,7 @@
     <Compile Include="errors\ModuleErrors.fs" />
     <Compile Include="TypeChecker.fs" />
     <Compile Include="BasicInterpreter.fs" />
+    <Compile Include="Interpreter.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

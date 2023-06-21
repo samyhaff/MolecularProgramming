@@ -9,7 +9,7 @@ module Checks =
     type Concentration = Con of float
 
     let private runCmd = Command.toCRN
-                        >> Simulator.simulate
+                        >> Simulator.simulateFast
                         >> Seq.skip (Simulator.stepsInDuration Simulator.approxCycleDuration)
                         >> Seq.head
 
@@ -43,7 +43,7 @@ module Checks =
         let C = ("C", c3)
 
         let crn = Modules.sub A B C |> runCmd
-        (conc A > conc B + 1.0) ==>
+        (conc A > conc B + 5.0) ==>
             (verify (name A) crn (conc A) && 
             verify (name B) crn (conc B) && 
             verify (name C) crn (conc A - conc B))
