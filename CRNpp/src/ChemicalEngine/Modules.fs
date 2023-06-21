@@ -71,6 +71,11 @@ module Modules =
 
         fromReactionAndSpecies reactions [A;B] |> Normal
 
+    let rxn reactants rate products =
+        let species = reactants @ products
+        let reactions = mapReactions [(reactants, rate, products)]
+        fromReactionAndSpecies reactions species
+
     let cmpE = ("cmpE", 0.5)
     let cmpX = ("cmpX", 0.0)
     let cmpXE = ("cmpXE", 0.0)
