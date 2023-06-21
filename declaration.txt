@@ -19,6 +19,9 @@ Program contributions:
 		Errors.ModuleErrors - Roar
 		TypeChecker - Samy
 		BasicInterpreter - Roar
+		Interpreter - Samy
+		Checks.AstGenerator - Roar
+		Checks.ParserChecks - Samy
 		Program - Changed by all
 
 	ChemicalEngine Project:

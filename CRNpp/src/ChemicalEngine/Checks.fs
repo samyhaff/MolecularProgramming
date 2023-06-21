@@ -7,6 +7,8 @@ module Checks =
     open FsCheck
 
     type Concentration = Con of float
+    type SubInputs = Sub of Concentration * Concentration
+    type DivInputs = Div of Concentration * Concentration
 
     let private runCmd = Command.toCRN
                         >> Simulator.simulateFast
@@ -19,7 +21,7 @@ module Checks =
     let verify (name:Name) (crn:CRN) (expected:float) =
         Map.find name (snd crn) |> conc |> floatEquals expected
 
-    let ldCheck (Con(c1)) (Con(c2)) =
+    let ldCheck (Con c1) (Con c2) =
         let A = ("A", c1)
         let B = ("B", c2)
 
@@ -27,52 +29,52 @@ module Checks =
         verify (name A) crn (conc A) &&
         verify (name B) crn (conc A)
 
-    let addCheck (Con(c1)) (Con(c2)) (Con(c3)) =
+    let addCheck (Con c1) (Con c2) =
         let A = ("A", c1)
         let B = ("B", c2)
-        let C = ("C", c3)
+        let C = ("C", 0.0)
 
         let crn = Modules.add A B C |> runCmd
         verify (name A) crn (conc A) && 
         verify (name B) crn (conc B) && 
         verify (name C) crn (conc A + conc B)
 
-    let subAgtBCheck (Con(c1)) (Con(c2)) (Con(c3)) =
+    let subAgtBCheck (Sub(Con c1, Con c2)) =
         let A = ("A", c1)
         let B = ("B", c2)
-        let C = ("C", c3)
+        let C = ("C", 0.0)
 
         let crn = Modules.sub A B C |> runCmd
-        (conc A > conc B + 5.0) ==>
-            (verify (name A) crn (conc A) && 
-            verify (name B) crn (conc B) && 
-            verify (name C) crn (conc A - conc B))
+
+        verify (name A) crn (conc A) && 
+        verify (name B) crn (conc B) && 
+        verify (name C) crn (conc A - conc B)
 
 
-    let mulCheck (Con(c1)) (Con(c2)) (Con(c3)) =
+    let mulCheck (Con c1) (Con c2) =
         let A = ("A", c1)
         let B = ("B", c2)
-        let C = ("C", c3)
+        let C = ("C", 0.0)
 
         let crn = Modules.mul A B C |> runCmd
         verify (name A) crn (conc A) &&
         verify (name B) crn (conc B) &&
         verify (name C) crn (conc A * conc B)
 
-    let divCheck (Con(c1)) (Con(c2)) (Con(c3)) =
+    let divCheck (Div(Con c1, Con c2)) =
         let A = ("A", c1)
         let B = ("B", c2)
-        let C = ("C", c3)
+        let C = ("C", 0.0)
 
         let crn = Modules.div A B C |> runCmd
-        (conc B > 0.5) ==>
-            (verify (name A) crn (conc A) &&
-            verify (name B) crn (conc B) &&
-            verify (name C) crn (conc A / conc B))
 
-    let sqrtCheck (Con(c1)) (Con(c2)) =
+        verify (name A) crn (conc A) &&
+        verify (name B) crn (conc B) &&
+        verify (name C) crn (conc A / conc B)
+
+    let sqrtCheck (Con c1) =
         let A = ("A", c1)
-        let B = ("B", c2)
+        let B = ("B", 0.0)
 
         let crn = Modules.sqrt A B |> runCmd
         verify (name A) crn (conc A) &&
@@ -98,31 +100,52 @@ module Checks =
         static member float() =
             {
                 new Arbitrary<float>() with
-                override x.Generator = Arb.generate<NormalFloat>
-                                        |> Gen.map NormalFloat.op_Explicit
+                override x.Generator = 
+                    Arb.generate<NormalFloat>
+                    |> Gen.map NormalFloat.op_Explicit
             }
         static member concentration() =
             {
                 new Arbitrary<Concentration>() with
-                override x.Generator = Arb.generate<NormalFloat>
-                                        |> Gen.map NormalFloat.op_Explicit
-                                        |> Gen.where ((<)0.0)
-                                        |> Gen.map (round >> Con)
+                override x.Generator = 
+                    Arb.generate<NormalFloat>
+                        |> Gen.map NormalFloat.op_Explicit
+                        |> Gen.where ((<)0.0)
+                        |> Gen.map (round >> Con)
             }
+        static member sub() =
+            {
+                new Arbitrary<SubInputs>() with
+                override x.Generator = 
+                    gen { 
+                        let! (Con a) = Arb.generate<Concentration>
+                        let bMax = max 0 ((int a) - 2)
+                        let! b = Gen.choose(0, bMax) // restrict domain to b + 2 < a
+                        return Sub(Con a, Con b)
+                    }
+            }
+        static member div() =
+            {
+                new Arbitrary<DivInputs>() with
+                override x.Generator = 
+                    Arb.generate<Concentration>
+                        |> Gen.map (fun c -> Div (c,c))
+                        // avoid division by zero or near-zero
+                        |> Gen.where (fun (Div (_, Con b)) -> b > 0.2)
+            }
+
 
     let runAll () =
         printfn $"Running {nameof ChemicalEngine} checks"
         let checkQuick lbl prop = Check.One ({Config.Quick with Name = lbl}, prop)
         Arb.register<CustomGenerators>() |> ignore
 
-        printfn "Checking modules:"
-        checkQuick "ld" ldCheck
-        checkQuick "add" addCheck
-        checkQuick "sub" subAgtBCheck
-        checkQuick "mul" mulCheck
-        checkQuick "div" divCheck
-        checkQuick "sqrt" sqrtCheck
-        checkQuick "cmp" cmpCheck
-        printfn "Module checks done"
+        checkQuick "ld module" ldCheck
+        checkQuick "add module" addCheck
+        checkQuick "sub module" subAgtBCheck
+        checkQuick "mul module" mulCheck
+        checkQuick "div module" divCheck
+        checkQuick "sqrt module" sqrtCheck
+        checkQuick "cmp module" cmpCheck
 
         printfn $"{nameof ChemicalEngine} checks done"

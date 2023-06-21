@@ -19,7 +19,7 @@ let pconc: Parser<Root> =
     >>. pipe2
       (pspecies .>> skipChar ',' .>> ws)
       (pnumber .>> ws .>> skipChar ']')
-      (fun s n -> Conc(s, n))
+      (fun s n -> Conc(S s, n))
 
 let ptwoargs (command: string) : Parser<Command> =
     skipString command >>. ws >>. skipChar '[' >>. ws
@@ -28,9 +28,9 @@ let ptwoargs (command: string) : Parser<Command> =
       (pspecies .>> ws .>> skipChar ']')
       (fun s1 s2 ->
          match command with
-         | "ld" -> Load(s1, s2)
-         | "cmp" -> Cmp(s1, s2)
-         | "sqrt" -> Sqrt(s1, s2)
+         | "ld" -> Load(S s1, S s2)
+         | "cmp" -> Cmp(S s1, S s2)
+         | "sqrt" -> Sqrt(S s1, S s2)
          | _ -> failwith "ptwoargs: unknown command")
 
 let pload: Parser<Command> = ptwoargs "ld"
@@ -44,10 +44,10 @@ let pbinop (op: string) : Parser<Command> =
       (pspecies .>> ws .>> skipChar ']')
       (fun s1 s2 s3 ->
          match op with
-         | "add" -> Add(s1, s2, s3)
-         | "sub" -> Sub(s1, s2, s3)
-         | "mul" -> Mul(s1, s2, s3)
-         | "div" -> Div(s1, s2, s3)
+         | "add" -> Add(S s1, S s2, S s3)
+         | "sub" -> Sub(S s1, S s2, S s3)
+         | "mul" -> Mul(S s1, S s2, S s3)
+         | "div" -> Div(S s1, S s2, S s3)
          | _ -> failwith "parithmetic: unknown operator")
 
 let padd: Parser<Command> = pbinop "add"
