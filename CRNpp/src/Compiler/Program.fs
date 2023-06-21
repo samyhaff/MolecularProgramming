@@ -2,6 +2,7 @@
 open Parser
 open TypeChecker
 open Visualizer
+open Interpreter
 
 [<EntryPoint>]
 let main argv =
@@ -36,18 +37,11 @@ let main argv =
       // Errors.Modules.subMinus1 ()
       // Errors.Modules.mul ()
       // Errors.Modules.div ()
-      // Examples.Formulas.simulatorPerformance()
-      0
    else
       let code = IO.File.ReadAllText(argv.[1])
-      // test pcrn code
       let program = parse code
-      printf "%A" (convert program)
-      drawAst program
-      let n = 10
-      let xs = [1..n] |> List.map float
-      BasicInterperter.run program
-         |> BasicInterperter.envSeqToConc n
-         |> List.map (fun (n, ys) -> Rendering.Plotting.scatter xs ys n) 
-         |> Rendering.Plotting.showPlots "GCD basic interpreter"
-      0
+      // printfn "%A" program
+      // printfn "Initial Concentrations: %A" (getInitialConcentrations program)
+      // printfn "%A" (convertAstToFormula program)
+      run program 450.0 ["a"; "b"] "Test"
+   0
