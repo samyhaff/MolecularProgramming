@@ -85,7 +85,7 @@ module Checks =
         let B = ("B", c2)
         
         let formula = [[Modules.cmp A B]]
-        let duration = Simulator.approxCycleDuration * Clock.stepPeriodF * 3.0
+        let duration = Simulator.approxCycleDuration * Clock.stepPeriodF * 1.9 // end of second phase, before next cycle begins
         
         let crn = Simulator.simulateFormula formula |> snd |> Seq.skip (Simulator.stepsInDuration duration) |> Seq.head
         if conc A > conc B then
