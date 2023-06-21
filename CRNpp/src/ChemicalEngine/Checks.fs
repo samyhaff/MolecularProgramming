@@ -84,22 +84,15 @@ module Checks =
         
         let formula = [[Modules.cmp A B]]
         let duration = Simulator.approxCycleDuration * Clock.stepPeriodF * 3.0
-
-        let _,data = (Simulator.watch duration formula)
         
+        let crn = Simulator.simulateFormula formula |> snd |> Seq.skip (Simulator.stepsInDuration duration) |> Seq.head
         if conc A > conc B then
-            data
-            |> List.find (fun (n, cs) -> n = name Modules.cmpYEltX)
-            |> (fun (n, c) -> floatEquals (List.last c) 1.0)
+            verify (name Modules.cmpYEltX) crn 1.0
         elif conc A < conc B then
-            data
-            |> List.find (fun (n, cs) -> n = name Modules.cmpYEgtX)
-            |> (fun (n, c) -> floatEquals (List.last c) 1.0)
+            verify (name Modules.cmpXEltY) crn 1.0
         else
-            data
-            |> List.filter (fun (n, cs) -> n = name Modules.cmpXEgtY || n = name Modules.cmpYEgtX)
-            |> List.map (fun (n, cs) -> List.last cs)
-            |> List.forall (fun c -> floatEquals c 1.0)
+            verify (name Modules.cmpXEgtY) crn 1.0 &&
+            verify (name Modules.cmpYEgtX) crn 1.0
     
     type CustomGenerators =
         static member float() =
