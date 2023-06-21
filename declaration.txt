@@ -33,7 +33,8 @@ Program contributions:
 		Modules - Roar
 		Simulator - Roar
 		FakeClockSimulator - Roar
-		Checks - Roar
+		Checks::cmp - Valeriu
+		Checks - all others: Roar
 
 	Rendering Project:
 		Plots - Roar
@@ -41,10 +42,15 @@ Program contributions:
 	DrawingTrees Project - Copied from project 1
 
 Report contributions:
+	Abstract - Valeriu
 	Introduction - Roar
-	...
-	...
-	...
+	1.1 Presented CRN grammar - Samy
+	1.2 Revised grammar - Samy and Roar
+	1.3 Additional syntactic restrictions - Samy and Roar
+	1.4 Abstract syntax tree - Samy
+	1.5 Language parsing - Samy
+	1.6 Type checker and basic interpreter - Samy and Roar
+	2.1 Reaction parser - Samy
 	2.2 CRN reactions simulator - Roar
 	2.3 Simulation evaluations - Roar
 	3 CRN compilations - Roar
