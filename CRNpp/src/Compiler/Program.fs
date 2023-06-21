@@ -11,6 +11,7 @@ let main argv =
       printfn "Usage: %s <filename>" programName
       printfn "Running checks..."
       ChemicalEngine.Checks.runAll ()
+      Checks.ParserChecks.runAll ()
       // Examples.Modules.watchModule (fun () -> ChemicalEngine.Modules.sub ("A",131.218572) ("B",24.45533649) ("C",46.70537003)) "sub test"
       // Examples.Modules.add ()
       // Examples.Modules.subAgtB ()
@@ -45,5 +46,5 @@ let main argv =
       // printfn "Initial Concentrations: %A" (getInitialConcentrations program)
       // printfn "%A" (convertAstToFormula program)
       // printfn "%A" (ParserChecks.parserCheck program)
-      run program 450.0 ["a"; "b"] "Test"
+      run program 600.0 ["a"; "b"] "Test"
    0

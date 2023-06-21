@@ -8,19 +8,19 @@ let getInitialConcentrations (ast: Crn) : Map<string, float> =
     let rec getInitialConcentrationsRoot ast env =
         match ast with
         | [] -> env
-        | Conc(s, c)::rest ->
+        | Conc(S s, c)::rest ->
             getInitialConcentrationsRoot rest (Map.add s c env)
         | Step(commands)::rest ->
             let rec getUnboundSpecies commands env =
                match commands with
                | [] -> env
-               | Sqrt(_, s)::rest
-               | Cmp(_, s)::rest
-               | Load(_, s)::rest
-               | Add(_, _, s)::rest
-               | Sub(_, _, s)::rest
-               | Mul(_, _, s)::rest
-               | Div(_, _, s)::rest ->
+               | Sqrt(_, S s)::rest
+               | Cmp(_, S s)::rest
+               | Load(_, S s)::rest
+               | Add(_, _, S s)::rest
+               | Sub(_, _, S s)::rest
+               | Mul(_, _, S s)::rest
+               | Div(_, _, S s)::rest ->
                   if not (Map.containsKey s env) then
                      getUnboundSpecies rest (Map.add s 0.0 env)
                   else
@@ -45,9 +45,9 @@ let convertAstToFormula (ast: Crn) :Reaction.Formula =
             let rec convertCommands (commands: Command list) : Reaction.Step =
                 match commands with
                     | [] -> []
-                    | Sqrt(s1, s2)::rest
-                    | Cmp(s1, s2)::rest
-                    | Load(s1, s2)::rest as (command::_ : Command list) ->
+                    | Sqrt(S s1, S s2)::rest
+                    | Cmp(S s1, S s2)::rest
+                    | Load(S s1, S s2)::rest as (command::_ : Command list) ->
                         let c1 = Map.find s1 env
                         let c2 = Map.find s2 env
                         match command with
@@ -55,10 +55,10 @@ let convertAstToFormula (ast: Crn) :Reaction.Formula =
                         | Cmp(_, _) -> (Modules.cmp (s1, c1) (s2, c2))::(convertCommands rest)
                         | Load(_, _) -> (Modules.ld (s1, c1) (s2, c2))::(convertCommands rest)
                         | _ -> failwith "Impossible"
-                    | Add(s1, s2, s3)::rest
-                    | Sub(s1, s2, s3)::rest
-                    | Mul(s1, s2, s3)::rest
-                    | Div(s1, s2, s3)::rest as (command::_ : Command list) ->
+                    | Add(S s1, S s2, S s3)::rest
+                    | Sub(S s1, S s2, S s3)::rest
+                    | Mul(S s1, S s2, S s3)::rest
+                    | Div(S s1, S s2, S s3)::rest as (command::_ : Command list) ->
                         let c1 = Map.find s1 env
                         let c2 = Map.find s2 env
                         let c3 = Map.find s3 env
@@ -77,16 +77,19 @@ let convertAstToFormula (ast: Crn) :Reaction.Formula =
                         match command with
                         | Ifgt(_) -> (Modules.ifGt convertedCommands)::(convertCommands rest)
                         | Iflt(_) -> (Modules.ifLt convertedCommands)::(convertCommands rest)
-                        | _ -> failwith "Missing cases"
+                        | Ifeq(_) -> (Modules.ifEq convertedCommands)::(convertCommands rest)
+                        | Ifge(_) -> (Modules.ifGe convertedCommands)::(convertCommands rest)
+                        | Ifle(_) -> (Modules.ifLe convertedCommands)::(convertCommands rest)
+                        | _ -> failwith "Impossible"
+                    | _ -> failwith "Impossible"
             let step = convertCommands commands
             in step::(convertRoot rest)
     in convertRoot ast
 
-let showCycles duration species title formula =
-    let filter = Simulator.onlyBySpecies species
-    let (xs, data) = Simulator.watchFiltered duration filter formula
-    data |> List.map (fun (n, ys) -> scatter xs ys n) |> showPlots title
+let showDuration duration names title formula =
+    let filter = Simulator.onlyByNames names
+    let (xs, data) = Simulator.watchFiltered duration filter formula |> Simulator.shrinkData
+    data |> List.map (fun (n, ys) -> line xs ys n) |> showLabelledPlots title "time" "concentrations" (600, 600)
 
 let run (ast: Crn) (duration: float) (species: string list) (title: string) =
-    let formula = convertAstToFormula ast
-    showCycles duration (List.map (fun s -> s, 0.0) species)  title formula
+    convertAstToFormula ast |> showDuration duration species title
