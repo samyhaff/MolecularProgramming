@@ -109,14 +109,11 @@ module Modules =
             add A cmpE cmpXE;
             ld B cmpY;
             add B cmpE cmpYE;
+            cmpMapping cmpXE cmpY cmpXEgtY cmpXEltY;
+            cmpMapping cmpYE cmpX cmpYEgtX cmpYEltX;
         ] |> Cmp
 
     let cmpStep2 () :Step = 
-        [
-            cmpMapping cmpXE cmpY cmpXEgtY cmpXEltY;
-            cmpMapping cmpYE cmpX cmpYEgtX cmpYEltX;
-        ]
-    let cmpStep3 () :Step =
         [
             cmpApproximateMajority cmpXEgtY cmpXEltY cmpB1;
             cmpApproximateMajority cmpYEgtX cmpYEltX cmpB2;

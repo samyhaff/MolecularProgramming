@@ -111,8 +111,7 @@ module Simulator =
             | [] -> []
             | step::rest when List.exists Command.containsCmp step -> 
                         let step2 = Modules.cmpStep2()
-                        let step3 = Modules.cmpStep3()
-                        step::step2::step3::insertCmpPhases rest
+                        step::step2::insertCmpPhases rest
             | step::rest -> step :: insertCmpPhases rest
 
         let compilation = insertCmpPhases formula
