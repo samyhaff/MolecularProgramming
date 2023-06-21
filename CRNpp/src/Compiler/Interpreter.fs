@@ -2,7 +2,6 @@ module Interpreter
 
 open ChemicalEngine
 open Ast
-open Rendering.Plotting
 
 let getInitialConcentrations (ast: Crn) : Map<string, float> =
     let rec getInitialConcentrationsRoot ast env =
@@ -30,7 +29,7 @@ let getInitialConcentrations (ast: Crn) : Map<string, float> =
                | Ifge(commands)::rest
                | Ifle(commands)::rest
                | Ifeq(commands)::rest ->
-                  getUnboundSpecies commands env
+                  getUnboundSpecies commands env |> getUnboundSpecies rest
             getInitialConcentrationsRoot rest (getUnboundSpecies commands env)
     in getInitialConcentrationsRoot ast Map.empty
 
@@ -86,10 +85,5 @@ let convertAstToFormula (ast: Crn) :Reaction.Formula =
             in step::(convertRoot rest)
     in convertRoot ast
 
-let showDuration duration names title formula =
-    let filter = Simulator.onlyByNames names
-    let (xs, data) = Simulator.watchFiltered duration filter formula |> Simulator.shrinkData
-    data |> List.map (fun (n, ys) -> line xs ys n) |> showLabelledPlots title "time" "concentrations" (600, 600)
-
-let run (ast: Crn) (duration: float) (species: string list) (title: string) =
-    convertAstToFormula ast |> showDuration duration species title
+let eval formula filter duration =
+    Simulator.watchFiltered duration filter formula |> Simulator.shrinkData

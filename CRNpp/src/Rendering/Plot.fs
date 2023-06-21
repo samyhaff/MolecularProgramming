@@ -21,6 +21,10 @@ module Plotting =
         // |> Chart.withYAxisStyle ("concentrations")
         |> P
 
+    let linePlots (xs, data) =
+      data |> List.map (fun (n, ys) -> line xs ys n) 
+
+
     let surface x y z xLabel yLabel zLabel =
         let axis title = LinearAxis.init (Title=Title.init title)
 

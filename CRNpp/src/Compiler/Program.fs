@@ -1,17 +1,17 @@
 ﻿open System
-open Parser
-open TypeChecker
-open Visualizer
-open Interpreter
+open Rendering.Plotting
+open System.Diagnostics
 
 [<EntryPoint>]
 let main argv =
    let programName = AppDomain.CurrentDomain.FriendlyName
-   if argv.Length = 0 then
-      printfn "Usage: %s <filename>" programName
+   if argv.Length = 1 && argv[0] = "checks"
+   then 
       printfn "Running checks..."
       ChemicalEngine.Checks.runAll ()
       Checks.ParserChecks.runAll ()
+   else if argv.Length <= 1 then
+      printfn "Usage: %s <filename> <?focused species eg: a b c>" programName
       // Examples.Modules.watchModule (fun () -> ChemicalEngine.Modules.sub ("A",131.218572) ("B",24.45533649) ("C",46.70537003)) "sub test"
       // Examples.Modules.add ()
       // Examples.Modules.subAgtB ()
@@ -39,12 +39,27 @@ let main argv =
       // Errors.Modules.mul ()
       // Errors.Modules.div ()
    else
-      let code = IO.File.ReadAllText(argv.[1])
-      let program = parse code
-      // printf "%s" (ParserChecks.crnToString program)
-      // printfn "%A" program
-      // printfn "Initial Concentrations: %A" (getInitialConcentrations program)
-      // printfn "%A" (convertAstToFormula program)
-      // printfn "%A" (ParserChecks.parserCheck program)
-      run program 600.0 ["a"; "b"] "Test"
+      let start = Stopwatch.GetTimestamp()
+      let programFileName = argv[1]
+      let title = programFileName
+      let duration = 1000.0
+
+      printfn $"Loading crn program: {title}"
+      let code = IO.File.ReadAllText(programFileName)
+      let focusSpecies = argv |> Seq.skip 2 |> Seq.toList
+
+      printfn "Parsing crn program"
+      let program = Parser.parse code
+      
+      printfn "Compiling crn compilation"
+      let formula = Interpreter.convertAstToFormula program
+
+      printfn $"Simulating crn for duration: {duration}"
+      let filter = if List.isEmpty focusSpecies then id else ChemicalEngine.Simulator.onlyByNames focusSpecies
+      let data = Interpreter.eval formula filter duration
+
+      printfn "Plotting simulation"
+      data |> linePlots |> showLabelledPlots title "time" "concentrations" (800, 800)
+      printfn "Finished"
+      printfn "Total time: %.2f s" (Stopwatch.GetElapsedTime start).TotalSeconds
    0
