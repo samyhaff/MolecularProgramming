@@ -80,6 +80,22 @@ module Checks =
         verify (name A) crn (conc A) &&
         verify (name B) crn (conc A |> sqrt)
 
+    let cmpCheck (Con(c1)) (Con(c2)) =
+        let A = ("A", c1)
+        let B = ("B", c2)
+        
+        let formula = [[Modules.cmp A B]]
+        let duration = Simulator.approxCycleDuration * Clock.stepPeriodF * 3.0
+        
+        let crn = Simulator.simulateFormula formula |> snd |> Seq.skip (Simulator.stepsInDuration duration) |> Seq.head
+        if conc A > conc B then
+            verify (name Modules.cmpYEltX) crn 1.0
+        elif conc A < conc B then
+            verify (name Modules.cmpXEltY) crn 1.0
+        else
+            verify (name Modules.cmpXEgtY) crn 1.0 &&
+            verify (name Modules.cmpYEgtX) crn 1.0
+    
     type CustomGenerators =
         static member float() =
             {
@@ -130,5 +146,6 @@ module Checks =
         checkQuick "mul module" mulCheck
         checkQuick "div module" divCheck
         checkQuick "sqrt module" sqrtCheck
+        checkQuick "cmp module" cmpCheck
 
         printfn $"{nameof ChemicalEngine} checks done"
