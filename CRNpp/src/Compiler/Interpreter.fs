@@ -97,9 +97,9 @@ let convertAstToFormula (ast: Crn) :Reaction.Formula =
                         let p = name products
                         let concentrationsReactants = List.map (fun (S s) -> Map.find s env) reactants
                         let concentrationsProducts = List.map (fun (S s) -> Map.find s env) products
-                        ((Modules.rxn
+                        (Modules.rxn
                             (List.zip r concentrationsReactants) rate (List.zip p concentrationsProducts))
-                        |> Reaction.Normal)::(convertCommands rest)
+                        ::(convertCommands rest)
                     | _ -> failwith "Impossible"
             let step = convertCommands commands
             in step::(convertRoot rest)
