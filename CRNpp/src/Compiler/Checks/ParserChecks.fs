@@ -1,3 +1,5 @@
+// Author: Samy Haffoudhi, 21/06/2023
+
 namespace Checks
 
 module ParserChecks =
