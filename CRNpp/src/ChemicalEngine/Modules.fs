@@ -8,7 +8,7 @@ module Modules =
 
     // todo add input restrictions
     let private mapReactions rs :Reaction list=
-        let mapSpecies = 
+        let mapSpecies =
             List.map (fun s -> (name s, 1))
         in List.map (fun (re,ra,pr) -> mapSpecies re, ra, mapSpecies pr) rs
 
@@ -71,6 +71,12 @@ module Modules =
 
         fromReactionAndSpecies reactions [A;B] |> Normal
 
+    let rxn reactants rate products =
+        let species = reactants @ products
+        let reactions = mapReactions [(reactants, rate, products)]
+        fromReactionAndSpecies reactions species |> Normal
+
+
     let cmpE = ("cmpE", 0.5)
     let cmpX = ("cmpX", 0.0)
     let cmpXE = ("cmpXE", 0.0)
@@ -111,7 +117,7 @@ module Modules =
             add B cmpE cmpYE;
         ] |> Cmp
 
-    let cmpStep2 () :Step = 
+    let cmpStep2 () :Step =
         [
             cmpMapping cmpXE cmpY cmpXEgtY cmpXEltY;
             cmpMapping cmpYE cmpX cmpYEgtX cmpYEltX;
@@ -125,11 +131,11 @@ module Modules =
     let private addCatalysts (catalysts:Species list) (reactions:Reaction list) =
         let addCatalystsToComponents components =
             List.map (fun (n,_) -> (n, 1)) catalysts @ components
-        in List.map (fun (reactants, rate, products) -> 
+        in List.map (fun (reactants, rate, products) ->
                 addCatalystsToComponents reactants, rate, addCatalystsToComponents products) reactions
 
     let private applyCatalystsToCmds catalysts commands =
-        let rec applyCatalystsToCmd cmd :Command= 
+        let rec applyCatalystsToCmd cmd :Command=
             match cmd with
             | Normal (r,s) -> Normal (addCatalysts catalysts r, s)
             | Cmp cmds -> Nested (List.map applyCatalystsToCmd cmds)
