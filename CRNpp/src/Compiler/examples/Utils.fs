@@ -27,4 +27,7 @@ module Utils =
     
     let showAll duration title formula = 
         showDuration duration id title formula
+    
+    let showNoClock duration title formula =
+        showDuration duration Simulator.removeClock title formula
         
