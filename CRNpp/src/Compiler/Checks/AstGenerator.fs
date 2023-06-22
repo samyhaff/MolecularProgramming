@@ -13,6 +13,7 @@ module AstGenerator =
                 | Load (s,_) | Sqrt (s,_) -> s::acc
                 | Add (s1,s2,_) | Sub (s1,s2,_) | Mul (s1,s2,_) 
                 | Div (s1,s2,_) | Cmp(s1,s2) ->  s1::s2::acc
+                | Rxn (reactants, _, _) -> reactants @ acc
                 | Ifeq cmds | Ifgt cmds | Ifge cmds | Iflt cmds | Ifle cmds -> extractInputs cmds
             ) [] commands
 
@@ -23,6 +24,7 @@ module AstGenerator =
                 | Add (_,_,s) | Sub (_,_,s) | Mul (_,_,s) 
                 | Div (_,_,s) ->  s::acc
                 | Cmp _ -> acc
+                | Rxn (_, products, _) -> products @ acc
                 | Ifeq cmds | Ifgt cmds | Ifge cmds | Iflt cmds | Ifle cmds -> extractOutputs cmds
             ) [] commands
 
