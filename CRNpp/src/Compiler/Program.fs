@@ -4,8 +4,14 @@ open System.Diagnostics
 
 [<EntryPoint>]
 let main argv =
-   let programName = AppDomain.CurrentDomain.FriendlyName
-   if argv.Length = 1 && argv[0] = "checks" then
+   if argv.Length = 0 then
+      let programName = AppDomain.CurrentDomain.FriendlyName
+      printfn "Welcome to the CRN++ simulator"
+      printfn "Invoke the simulator in one of 3 ways:"
+      printfn "dotnet run checks - runs implemented property checks"
+      printfn "dotnet run example <example-name> - simulates the predefined example"
+      printfn "dotnet run <crn-program> <?focused species eg: a b c> - simulates crn program with optional species filtering"
+   else if argv.Length = 1 && argv[0] = "checks" then
       printfn "Running checks..."
       ChemicalEngine.Checks.runAll ()
       Checks.ParserChecks.runAll ()
@@ -41,13 +47,13 @@ let main argv =
       | _ -> failwith "Unknown example"
    else
       let start = Stopwatch.GetTimestamp()
-      let programFileName = argv[1]
+      let programFileName = argv[0]
       let title = programFileName
       let duration = 1000.0
 
       printfn $"Loading crn program: {title}"
       let code = IO.File.ReadAllText(programFileName)
-      let focusSpecies = argv |> Seq.skip 2 |> Seq.toList
+      let focusSpecies = argv |> Seq.skip 1 |> Seq.toList
 
       printfn "Parsing crn program"
       let program = Parser.parse code
