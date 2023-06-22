@@ -7,6 +7,7 @@
     <Compile Include="Ast.fs" />
     <Compile Include="Visualizer.fs" />
     <Compile Include="Parser.fs" />
+    <Compile Include="Examples\Utils.fs" />
     <Compile Include="Examples\Modules.fs" />
     <Compile Include="Examples\Clocks.fs" />
     <Compile Include="Examples\Formulas.fs" />

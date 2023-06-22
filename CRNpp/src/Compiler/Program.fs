@@ -5,40 +5,40 @@ open System.Diagnostics
 [<EntryPoint>]
 let main argv =
    let programName = AppDomain.CurrentDomain.FriendlyName
-   if argv.Length = 1 && argv[0] = "checks"
-   then
+   if argv.Length = 1 && argv[0] = "checks" then
       printfn "Running checks..."
       ChemicalEngine.Checks.runAll ()
       Checks.ParserChecks.runAll ()
-   else if argv.Length <= 1 then
-      printfn "Usage: %s <filename> <?focused species eg: a b c>" programName
-      // Examples.Modules.watchModule (fun () -> ChemicalEngine.Modules.sub ("A",131.218572) ("B",24.45533649) ("C",46.70537003)) "sub test"
-      // Examples.Modules.add ()
-      // Examples.Modules.subAgtB ()
-      // Examples.Modules.subAltB ()
-      // Examples.Modules.mul ()
-      // Examples.Modules.div ()
-      // Examples.Modules.divBy0 ()
-      // Examples.Modules.sqrt ()
-      // Examples.Modules.clock ()
-      // Examples.Modules.cmp ()
-      // Examples.Modules.ifGt ()
-      // Examples.Modules.rxn ()
-      // Examples.Modules.clock 3
-      // Examples.Reactions.exampleReaction @"A: 1.0, B: 2.0, C: 0.0; A -> A + C, B -> B + C, C -> 0"
-      // Examples.Formulas.factorial 5
-      // Examples.Formulas.eulersConstant ()
-      // Examples.Formulas.pi ()
-      // Examples.Formulas.discrete_counter 3
-      // Examples.Formulas.division 20 3
-      // Examples.Formulas.integer_square_root 10
-      // Errors.Modules.add ()
-      // Errors.Modules.sub ()
-      // Errors.Modules.subAGtB ()
-      // Errors.Modules.subOneOff ()
-      // Errors.Modules.subMinus1 ()
-      // Errors.Modules.mul ()
-      // Errors.Modules.div ()
+   else if argv.Length = 2 && argv[0] = "example" then
+      // printfn "Usage: %s <filename> <?focused species eg: a b c>" programName
+      match argv[1] with
+      | "module:add" -> Examples.Modules.add ()
+      | "module:subA>B" -> Examples.Modules.subAgtB ()
+      | "module:subA<B" -> Examples.Modules.subAltB ()
+      | "module:mul" -> Examples.Modules.mul ()
+      | "module:div" -> Examples.Modules.div ()
+      | "module:divBy0" -> Examples.Modules.divBy0 ()
+      | "module:sqrt" -> Examples.Modules.sqrt ()
+      | "module:clock" -> Examples.Modules.clock ()
+      | "module:cmp" -> Examples.Modules.cmp ()
+      | "module:ifGt" -> Examples.Modules.ifGt ()
+      | "module:rxn" -> Examples.Modules.rxn ()
+      | "reaction" -> Examples.Reactions.exampleReaction @"A: 1.0, B: 2.0, C: 0.0; A -> A + C, B -> B + C, C -> 0"
+      | "formula:fact5" -> Examples.Formulas.factorial 5
+      | "formula:e" -> Examples.Formulas.eulersConstant ()
+      | "formula:pi" -> Examples.Formulas.pi ()
+      | "formula:discrete_counter" -> Examples.Formulas.discrete_counter 3
+      | "formula:division" -> Examples.Formulas.division 20 3
+      | "formula:integer_square_root" -> Examples.Formulas.integer_square_root 10
+      | "performance:bigCRN" -> Examples.Formulas.performanceTest ()
+      | "errors:add" -> Errors.Modules.add ()
+      | "errors:sub" -> Errors.Modules.sub ()
+      | "errors:subA>B" -> Errors.Modules.subAGtB ()
+      | "errors:subClose" -> Errors.Modules.subOneOff ()
+      | "errors:subOne" -> Errors.Modules.subMinus1 ()
+      | "errors:mul" -> Errors.Modules.mul ()
+      | "errors:div" -> Errors.Modules.div ()
+      | _ -> failwith "Unknown example"
    else
       let start = Stopwatch.GetTimestamp()
       let programFileName = argv[1]

@@ -7,18 +7,7 @@ module Formulas =
     open Modules
     open Reaction
     open Rendering.Plotting
-
-    let private plot filter title (xs,data) = 
-        data |> filter |> List.map (fun (n, ys) -> line xs ys n) |> showPlots title
-    let private showCycles duration species title formula =
-        let output = Simulator.watch duration formula |> Simulator.shrinkData
-        // output |> plot id title // for plotting all signals
-        output |> plot (Simulator.onlyBySpecies species) title
-    
-    let private showAll duration title formula = 
-
-        let output = Simulator.watch duration formula |> Simulator.shrinkData
-        output |> plot id title // for plotting all signals
+    open Utils
         
     let factorial n = 
         printfn "Calculating factorial formula"
@@ -43,7 +32,7 @@ module Formulas =
             ]
         ]
 
-        showCycles 800.0 [fS] $"factorial: {n}!" formula
+        showSpecies 800.0 [fS] $"factorial: {n}!" formula
 
     let eulersConstant () =
         printfn "Calculating eulers constant formula"
@@ -71,7 +60,7 @@ module Formulas =
             ]
         ]
 
-        showCycles 350.0 [eS] "eulers constant 2.718..." formula
+        showSpecies 350.0 [eS] "eulers constant 2.718..." formula
 
 
     let pi () = 
@@ -104,7 +93,7 @@ module Formulas =
                 ld piNextS piS
             ]
         ]
-        showCycles 400.0 [piS] "pi 3.1415..." formula
+        showSpecies 400.0 [piS] "pi 3.1415..." formula
 
 
     let discrete_counter n =
@@ -128,7 +117,7 @@ module Formulas =
             ]
         ]
 
-        showCycles 2000.0 [cS] $"discrete counter of {n}" formula
+        showSpecies 2000.0 [cS] $"discrete counter of {n}" formula
 
     let division a0 b0 =
         printfn $"division formula for a0={a0} and b0={b0}"
@@ -160,7 +149,7 @@ module Formulas =
                 ifLt [ld aS rS]
             ]
         ]
-        showCycles 2000.0 [aS;bS;qS;rS;] $"division a0={a0}, b0={b0}" formula
+        showSpecies 2000.0 [aS;bS;qS;rS;] $"division a0={a0}, b0={b0}" formula
 
     let integer_square_root n0 =
         printfn $"integer square root formula for n0={n0}"
@@ -185,7 +174,7 @@ module Formulas =
             ]
         ]
 
-        showCycles 2000.0 [zS; zpowS; outS] $"integer square root n0={n0}" formula
+        showSpecies 2000.0 [zS; zpowS; outS] $"integer square root n0={n0}" formula
 
     let simulatorPerformance () = 
         let nAddModules n =
@@ -230,3 +219,40 @@ module Formulas =
         let data = [("fast", fastData); ("original", slowData)]
 
         data |> List.map (fun (n, ys) -> line ([1..List.length ys] |> List.map float) ys n) |> showPlots "performance improvement for n steps each with 1 add module"
+
+
+    let performanceTest () =
+        let A = ("A", 10.0)
+        let B = ("B", 11.0)
+        let C = ("C", 12.0)
+        let one = ("one", 1.0)
+
+        let Anext = ("Anext", 0.0)
+        let Bnext = ("Bnext", 0.0)
+        let Cnext = ("Cnext", 0.0)
+
+        let addStep = [
+            add A one Anext
+            add B one Bnext
+            add C one Cnext
+        ]
+        let subStep = [
+            sub A one Anext
+            sub B one Bnext
+            sub C one Cnext
+        ]
+        let loadStep = [
+            ld Anext A
+            ld Bnext B
+            ld Cnext C
+        ]
+
+        let formula = 
+            [1..4] 
+            |> List.collect (fun _ -> [addStep; loadStep; subStep; loadStep])
+        
+
+        let steps = List.length formula 
+        let duration = 5.0 * float steps * Clock.stepPeriodF * Simulator.approxCycleDuration
+        // showAll duration "Big CRN test" formula
+        showSpecies duration [A;B;C] "Big CRN test" formula
