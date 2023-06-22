@@ -6,7 +6,7 @@ open System.Diagnostics
 let main argv =
    let programName = AppDomain.CurrentDomain.FriendlyName
    if argv.Length = 1 && argv[0] = "checks"
-   then 
+   then
       printfn "Running checks..."
       ChemicalEngine.Checks.runAll ()
       Checks.ParserChecks.runAll ()
@@ -50,7 +50,7 @@ let main argv =
 
       printfn "Parsing crn program"
       let program = Parser.parse code
-      
+
       printfn "Compiling crn compilation"
       let formula = Interpreter.convertAstToFormula program
 

@@ -10,6 +10,7 @@ type Env = {
 
 let rec checkModule (command: Command) (env: Env)=
    match command with
+   | Rxn(_) -> (true, env)
    | Add(S s1, S s2, S s3)
    | Sub(S s1, S s2, S s3)
    | Mul(S s1, S s2, S s3)

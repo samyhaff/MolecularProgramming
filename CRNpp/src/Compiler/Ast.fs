@@ -4,6 +4,7 @@ type species = S of string
 
 type Command =
    | Load of species * species
+   | Rxn of species list * species list * float
    // Arithmetic
    | Add of species * species * species
    | Sub of species * species * species
@@ -17,7 +18,6 @@ type Command =
    | Iflt of Command list
    | Ifle of Command list
    | Ifeq of Command list
-   // TODO add rxn
 
 type Root =
     | Conc of species * float
