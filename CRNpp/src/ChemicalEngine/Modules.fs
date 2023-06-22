@@ -30,10 +30,10 @@ module Modules =
 
         fromReactionAndSpecies reactions [A;B;C] |> Normal
 
-    let subTmpName = "subTmp"
     let sub A B C =
         let rate = 1.0
 
+        let subTmpName = sprintf "subTmp:%s-%s" (name A) (name B)
         let H = (subTmpName, 0.0)
         let reactions = mapReactions [
             ([A], rate, [A; C]);
