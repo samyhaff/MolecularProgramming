@@ -23,6 +23,7 @@ let main argv =
       // Examples.Modules.clock ()
       // Examples.Modules.cmp ()
       // Examples.Modules.ifGt ()
+      // Examples.Modules.rxn ()
       // Examples.Modules.clock 3
       // Examples.Reactions.exampleReaction @"A: 1.0, B: 2.0, C: 0.0; A -> A + C, B -> B + C, C -> 0"
       // Examples.Formulas.factorial 5

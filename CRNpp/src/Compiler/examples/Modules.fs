@@ -103,3 +103,17 @@ module Modules =
         let duration = 90.0
         Simulator.watch duration formula |> showScatter "ifGt A > B -> C := A; A < B -> C := B"
 
+
+    let rxn () =
+        let A = ("A", 2.0)
+        let B = ("B", 4.0)
+
+        let formula = [
+            [
+                Modules.rxn [A] 1.0 [A; B]
+                Modules.rxn [B] 1.0 []
+            ]
+        ]
+
+        let duration = 20.0
+        Simulator.watch duration formula |> showScatter "Load A->B via rxn module"
